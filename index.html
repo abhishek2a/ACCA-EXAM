@@ -1,0 +1,3098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACCA FR (Financial Reporting) — CBE Exam Practice Platform</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --acca-navy: #1b365d;
+      --acca-navy-dark: #132744;
+      --acca-red: #d31245;
+      --acca-red-dark: #a80d36;
+      --cbe-bar: #e8edf2;
+      --cbe-border: #c5d0dc;
+      --cbe-bg: #f4f6f9;
+      --cbe-flag: #d97706;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--cbe-bg);
+      color: #1e293b;
+      margin: 0;
+    }
+    .font-mono-num { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; }
+    .cbe-header { background: linear-gradient(180deg, #21406e 0%, #1b365d 100%); }
+    .cbe-footer { background: linear-gradient(180deg, #1b365d 0%, #132744 100%); }
+    .cbe-toolbar { background: #eef2f6; border-bottom: 1px solid #cbd5e1; }
+    .cbe-btn-tool {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px; border-radius: 4px; font-size: 13px; font-weight: 500;
+      color: #1e293b; background: #ffffff; border: 1px solid #cbd5e1;
+      transition: all 0.15s ease; cursor: pointer;
+    }
+    .cbe-btn-tool:hover { background: #e2e8f0; border-color: #94a3b8; }
+    .cbe-btn-tool.active { background: #1b365d; color: #ffffff; border-color: #1b365d; }
+    .cbe-btn-tool.flagged { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+    .cbe-option-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 6px;
+      background: #ffffff; transition: all 0.15s ease; cursor: pointer;
+    }
+    .cbe-option-row:hover { border-color: #1b365d; background: #f8fafc; }
+    .cbe-option-row.selected { border-color: #1b365d; background: #eff6ff; box-shadow: inset 3px 0 0 #1b365d; }
+    .cbe-option-row.struck .opt-text { text-decoration: line-through; color: #94a3b8; }
+    .cbe-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+    .cbe-table th, .cbe-table td { border: 1px solid #94a3b8; padding: 8px 12px; text-align: left; }
+    .cbe-table th { background: #e8edf2; font-weight: 600; color: #0f172a; }
+    .cbe-table td.num, .cbe-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .cbe-highlight { background-color: #fef08a; padding: 0 2px; border-radius: 2px; }
+    .highlight-mode-cursor .cbe-highlight { cursor: pointer; outline: 1px dashed #ca8a04; }
+    .drag-handle { cursor: move; user-select: none; }
+    .highlight-mode-cursor { cursor: text; }
+    .strikethrough-mode-cursor .cbe-option-row { cursor: crosshair; }
+    .cbe-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+    .cbe-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    .cbe-scroll::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+    .cbe-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    .floating-window {
+      position: fixed; z-index: 60; background: #ffffff;
+      border: 1px solid #94a3b8; border-radius: 8px;
+      box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.25), 0 8px 12px -6px rgba(15, 23, 42, 0.15);
+    }
+    @keyframes pulseWarn {
+      0%, 100% { background-color: #dc2626; }
+      50% { background-color: #991b1b; }
+    }
+    .timer-critical { animation: pulseWarn 1.2s infinite; }
+    .calc-btn {
+      padding: 10px 6px; border-radius: 5px; font-weight: 600; font-size: 14px;
+      border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a;
+      transition: background 0.1s; cursor: pointer;
+    }
+    .calc-btn:hover { background: #e2e8f0; }
+    .calc-btn.op { background: #e0e7ff; color: #1e3a8a; border-color: #c7d2fe; }
+    .calc-btn.op:hover { background: #c7d2fe; }
+    .calc-btn.eq { background: #1b365d; color: #ffffff; border-color: #1b365d; }
+    .calc-btn.eq:hover { background: #132744; }
+    .calc-btn.clr { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+    .calc-btn.clr:hover { background: #fecaca; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<div id="app" class="flex-1 flex flex-col min-h-screen"></div>
+
+<script>
+// ============================================================================
+// ACCA FR EXAM DATA (ALL 60 QUESTIONS VERBATIM FROM UPLOADED PAPERS)
+// ============================================================================
+const EXAMS = [
+  {
+    id: 'exam1',
+    code: 'FR-MOCK-OCT26',
+    title: 'Financial Reporting (FR) — Mock Test',
+    subtitle: 'BCOM ACCA FR B1 • Oct 2026 • Indian Institute of Commerce Lakshya',
+    totalQuestions: 30,
+    totalMarks: 60,
+    marksPerQuestion: 2,
+    accaMinutes: 108, // ACCA Standard: 1.8 mins per mark (180 mins / 100 marks)
+    paperMinutes: 100, // Stated on paper
+    sections: [
+      { id: 'A', name: 'Section A — Objective Test Questions', range: [1, 15], description: '15 individual questions (2 marks each = 30 marks)' },
+      { id: 'B', name: 'Section B — Objective Test Case Scenarios', range: [16, 30], description: '3 scenarios × 5 questions each (2 marks each = 30 marks)' }
+    ],
+    scenarios: {
+      grinnit: {
+        id: 'grinnit',
+        title: 'GRINNIT CO',
+        rangeLabel: 'Questions 16 – 20',
+        topic: 'IAS 12 & IAS 16',
+        html: `
+          <p class="font-semibold text-slate-900 mb-3">The following scenario relates to questions 16 – 20.</p>
+          <p class="mb-3">Grinnit Co is preparing its financial statements for the year ended 31 October 20X7.</p>
+          <p class="mb-3">Grinnit Co has a deferred tax liability at 1 November 20X6 of <strong>$62,000</strong>. This had been caused by differences between depreciation charges and tax allowances.</p>
+          <p class="mb-3">At 31 October 20X7, the tax base of Grinnit Co's net assets was <strong>$180,000</strong> less than the carrying amount. This has been caused by the differences between depreciation charges and tax allowances and excludes the following effects of a revaluation of land.</p>
+          <p class="mb-3">Grinnit Co decided to revalue its land for the first time on 1 August 20X7. A qualified surveyor valued the land on that date at <strong>$300,000</strong>. The land had been purchased four years ago for <strong>$240,000</strong>.</p>
+          <p class="mb-1">The income tax rate is <strong>30%</strong>.</p>
+        `
+      },
+      gammon: {
+        id: 'gammon',
+        title: 'GAMMON CO',
+        rangeLabel: 'Questions 21 – 25',
+        topic: 'IFRS 5 & IAS 33',
+        html: `
+          <p class="font-semibold text-slate-900 mb-3">The following scenario relates to questions 21 – 25.</p>
+          <p class="mb-3">Gammon Co manufactures and sells a wide variety of furniture. Its year-end date is 31 October 20X4.</p>
+          <p class="mb-3">During the year, Gammon Co commenced restructuring and, as part of this, the Garden Furniture division was classified as held for sale. The Garden Furniture division was sold on 12 January 20X5. Prior to its classification as 'held for sale', the division's current assets were realised and the proceeds were used to settle its liabilities.</p>
+          <p class="mb-2">Relevant information on the non-current assets of the Garden Furniture division at 31 October 20X4 is presented below:</p>
+          <table class="cbe-table">
+            <thead>
+              <tr>
+                <th>Non-current assets of the Garden Furniture division at 31 October 20X4</th>
+                <th class="num">$'000</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Carrying amount</td><td class="num">31,350</td></tr>
+              <tr><td>Value in use</td><td class="num">20,010</td></tr>
+              <tr><td>Fair value</td><td class="num">26,940</td></tr>
+              <tr><td>Selling costs</td><td class="num">2,040</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 mb-2 font-medium text-slate-900">On 1 August 20X4, to partly-fund the restructuring:</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-3">
+            <li>(1) 18m equity (ordinary) shares were issued at market value.</li>
+            <li>(2) $60m of 8% convertible loan notes were issued at par. The effective interest rate was also 8%.</li>
+          </ol>
+          <p class="mb-2 font-medium text-slate-900">Additional relevant information for Gammon Co:</p>
+          <ol class="list-none pl-2 space-y-1.5">
+            <li>(1) 60m equity (ordinary) shares were in issue on 1 November 20X3.</li>
+            <li>(2) On 1 March 20X4, a one-for-four issue of bonus shares was made.</li>
+            <li>(3) Profit for the year from continuing operations for the year ended 31 October 20X4 was $103.8m.</li>
+            <li>(4) The income tax rate is 20%.</li>
+          </ol>
+        `
+      },
+      shawler: {
+        id: 'shawler',
+        title: 'SHAWLER CO',
+        rangeLabel: 'Questions 26 – 30',
+        topic: 'IAS 16, IAS 20 & IAS 37',
+        html: `
+          <p class="font-semibold text-slate-900 mb-3">The following scenario relates to questions 26 – 30.</p>
+          <p class="mb-3">Shawler Co is a small manufacturing company specialising in making alloy castings. Its main item of plant is a furnace which was purchased on 1 October 20X5. The furnace has two components: the main body (cost <strong>$42,000</strong>) which has a ten-year life, and a replaceable liner (cost <strong>$10,000</strong>) with a five-year life.</p>
+          <p class="mb-3">The manufacturing process produces toxic chemicals which pollute the nearby environment. Legislation requires that a clean-up operation must be undertaken by Shawler Co on 30 September 20Y5 at the latest. The cost of the clean-up operation has been estimated at <strong>$38,900</strong>.</p>
+          <p class="mb-3">On 1 October 20X5 the present value of this amount was calculated at <strong>$18,000</strong>, using the company's cost of capital of <strong>8%</strong>. On 1 October 20X5 Shawler Co received a government grant of <strong>$12,000</strong> relating to the cost of the main body of the furnace only. No other conditions were attached to the grant.</p>
+          <p class="mb-1">On 1 April 20X6, the government introduced further environmental legislation which had the effect of requiring Shawler Co to fit anti-pollution filters to its furnace within two years. An environmental consultant has calculated that fitting the filters will reduce Shawler Co's required environmental costs (and therefore its provision) by <strong>33%</strong>. At 30 September 20X6 Shawler Co had not yet fitted the filters.</p>
+        `
+      }
+    },
+    questions: [
+      {
+        num: 1, section: 'A', type: 'mcq', topic: 'IFRS 15 Revenue', marks: 2,
+        stem: `<p class="mb-3">Gim sells a laptop and a two-year support package for a total of $1,200. Stand-alone selling prices are: laptop $1,000, support $500 (for the two years). The laptop is delivered and support begins on 1 January 20X4.</p><p class="font-semibold text-slate-900">What total revenue should Gim recognise in the year ended 31 December 20X4?</p>`,
+        options: [
+          { key: 'A', text: '$1,200' },
+          { key: 'B', text: '$1,000' },
+          { key: 'C', text: '$800' },
+          { key: 'D', text: '$700' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IFRS 15</strong>, allocate the transaction price ($1,200) based on relative stand-alone selling prices (total = $1,000 + $500 = $1,500):<br>• Laptop: $1,200 × ($1,000 / $1,500) = $800 (recognised at point in time on 1 Jan 20X4).<br>• Support (2 years): $1,200 × ($500 / $1,500) = $400 → $200 per year (recognised over time).<br>• Total revenue in 20X4 = $800 + $200 = <strong>$1,000</strong>.`
+      },
+      {
+        num: 2, section: 'A', type: 'mcq', topic: 'IFRS 15 Revenue', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Which of the following is NOT a criterion for recognising revenue over time under IFRS 15?</p>`,
+        options: [
+          { key: 'A', text: 'The contract term is longer than one year' },
+          { key: 'B', text: 'The customer simultaneously receives and consumes the benefits as the entity performs' },
+          { key: 'C', text: "The entity's performance creates or enhances an asset that the customer controls" },
+          { key: 'D', text: "The entity's performance creates an asset with no alternative use and the entity has an enforceable right to payment for performance to date" }
+        ],
+        correct: 'A',
+        explanation: `<strong>IFRS 15.35</strong> sets out three criteria for over-time revenue recognition (options B, C, and D). The length of the contract term (e.g. longer than one year) is <strong>not</strong> a criterion.`
+      },
+      {
+        num: 3, section: 'A', type: 'mcq', topic: 'IFRS 15 / IAS 37', marks: 2,
+        stem: `<p class="mb-3">Wix sells a machine with a standard one-year warranty that it meets its specification. Customers can also buy an extended three-year warranty separately.</p><p class="font-semibold text-slate-900">How should these warranties be accounted for?</p>`,
+        options: [
+          { key: 'A', text: 'Both are separate performance obligations' },
+          { key: 'B', text: 'Both are provisions under IAS 37' },
+          { key: 'C', text: 'Both are expensed when claims are paid' },
+          { key: 'D', text: 'The standard warranty is an IAS 37 provision; the extended warranty is a separate performance obligation recognised over three years' }
+        ],
+        correct: 'D',
+        explanation: `Under <strong>IFRS 15 (B28–B33)</strong>, an assurance-type (standard) warranty is accounted for as a provision under <strong>IAS 37</strong>, whereas an optional service-type (extended) warranty purchased separately is a distinct performance obligation recognised over the three-year service period.`
+      },
+      {
+        num: 4, section: 'A', type: 'mcq', topic: 'IFRS 15 Repurchase', marks: 2,
+        stem: `<p class="mb-3">Zed sells a machine for $100,000 and agrees to repurchase it after two years for $70,000. The transaction is not part of a sale and leaseback.</p><p class="font-semibold text-slate-900">How is the transaction treated?</p>`,
+        options: [
+          { key: 'A', text: 'As a sale, with revenue of $100,000' },
+          { key: 'B', text: 'As a financing arrangement' },
+          { key: 'C', text: 'As a sale with a right of return' },
+          { key: 'D', text: 'As a lease under IFRS 16' }
+        ],
+        correct: 'D',
+        explanation: `Under <strong>IFRS 15.B66(a)</strong>, when an entity has an obligation (forward) or right (call option) to repurchase an asset for <em>less than</em> the original selling price ($70,000 &lt; $100,000) and it is not a sale and leaseback, the contract is accounted for as a <strong>lease under IFRS 16</strong>.`
+      },
+      {
+        num: 5, section: 'A', type: 'mcq', topic: 'IFRS 15 Financing', marks: 2,
+        stem: `<p class="mb-3">On 1 January 20X1 Glass Co sells goods to Vase Co for $350,000, payable on 31 December 20X4. The relevant discount rate is 8%. The present value of $1 receivable at the end of year 4 based on a discount rate of 8% is $0.74.</p><p class="font-semibold text-slate-900">What amounts of revenue and interest income should be recognised in profit or loss for the year ended 31 December 20X2?</p>`,
+        options: [
+          { key: 'A', text: 'Revenue $259,000; interest income $20,720' },
+          { key: 'B', text: 'Revenue $350,000; interest income nil' },
+          { key: 'C', text: 'Revenue nil; interest income $22,378' },
+          { key: 'D', text: 'Revenue nil; interest income $20,720' }
+        ],
+        correct: 'C',
+        explanation: `• 1 Jan 20X1: Revenue recognised = $350,000 × 0.74 = $259,000.<br>• Year ended 31 Dec 20X1: Interest income = $259,000 × 8% = $20,720 → Closing receivable = $279,720.<br>• Year ended 31 Dec 20X2: Revenue = <strong>nil</strong>; Interest income = $279,720 × 8% = $22,377.60 ≈ <strong>$22,378</strong>.`
+      },
+      {
+        num: 6, section: 'A', type: 'multi', selectCount: 2, topic: 'IFRS 15 Control', marks: 2,
+        stem: `<p class="mb-3">Jentil Co is a company which manufactures ovens and supplies them to retailers. There are no direct sales to the public.</p><p class="font-semibold text-slate-900">Which TWO of the following would indicate that Jentil Co should recognise revenue at the point of delivery?</p>`,
+        options: [
+          { key: 'A', text: 'The retailer must pay a penalty to Jentil Co if it returns new ovens which are in full working order' },
+          { key: 'B', text: 'The retailer has signed proof of delivery and unconditionally accepted the delivery of the ovens from Jentil Co' },
+          { key: 'C', text: 'Jentil Co has a statutory right to request the return of the ovens in exchange for the original consideration, without further compensating the retailer' },
+          { key: 'D', text: 'Obsolete models of ovens may be returned by the retailer to Jentil Co in exchange for the original consideration, without being further compensated' }
+        ],
+        correct: ['A', 'B'],
+        explanation: `<strong>A</strong> and <strong>B</strong> indicate transfer of control to the retailer at delivery (IFRS 15.38: customer acceptance and significant risks/rewards of ownership). C (repurchase right) and D (unconditional right to return obsolete stock) indicate a consignment/no transfer of control.`
+      },
+      {
+        num: 7, section: 'A', type: 'mcq', topic: 'IFRS 9 Financial Assets', marks: 2,
+        stem: `<p class="mb-3">On 1 January 20X8 Penfold purchased a debt instrument for its fair value of $500,000. It has a principal amount of $550,000 and is due to mature in five years. The debt instrument carries fixed interest of 6% paid annually in arrears and has an effective interest rate of 8%. The debt instrument meets the business model test to be measured at amortised cost.</p><p class="font-semibold text-slate-900">At what amount will the debt instrument be presented in the statement of financial position of Penfold as at 31 December 20X9?</p>`,
+        options: [
+          { key: 'A', text: '$514,560' },
+          { key: 'B', text: '$566,000' },
+          { key: 'C', text: '$564,560' },
+          { key: 'D', text: '$520,800' }
+        ],
+        correct: 'A',
+        explanation: `Annual coupon received = $550,000 × 6% = $33,000.<br>• 20X8: $500,000 + ($500,000 × 8% = $40,000) − $33,000 = $507,000.<br>• 20X9: $507,000 + ($507,000 × 8% = $40,560) − $33,000 = <strong>$514,560</strong>.`
+      },
+      {
+        num: 8, section: 'A', type: 'mcq', topic: 'IFRS 9 Financial Liabilities', marks: 2,
+        stem: `<p class="mb-3">On 1 January 20X5 Dune Co issued a $500,000 3% bond redeemable at par in five years. Issue costs were $40,000, so the net proceeds were $460,000. The effective rate of interest is 6%. Interest is paid annually in arrears.</p><p class="font-semibold text-slate-900">What is the carrying amount of the bond in Dune Co's statement of financial position at 31 December 20X5?</p>`,
+        options: [
+          { key: 'A', text: '$445,000' },
+          { key: 'B', text: '$460,000' },
+          { key: 'C', text: '$472,600' },
+          { key: 'D', text: '$487,600' }
+        ],
+        correct: 'C',
+        explanation: `Opening liability = $460,000.<br>• Effective interest (6%) = $460,000 × 6% = $27,600.<br>• Cash interest paid (3% of $500,000) = $15,000.<br>• Closing carrying amount = $460,000 + $27,600 − $15,000 = <strong>$472,600</strong>.`
+      },
+      {
+        num: 9, section: 'A', type: 'mcq', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="mb-3">Raycroft operates a nuclear power station. The power station is due to be decommissioned on 31 December 20Y4 and will be fully operational up to that date. It has been estimated that the cost of decommissioning the power station and cleaning up any environmental damage, as required by legislation, will be $60 million. Raycroft recognised a provision for the present value of this expenditure at 31 December 20X6. A suitable discount rate for evaluating costs of this nature is 12%, equivalent to a present value factor after eight years of 0.404. The decommissioning cost will be depreciated over eight years.</p><p class="font-semibold text-slate-900">What is the TOTAL charge to profit or loss in respect of this provision for the year ended 31 December 20X7?</p>`,
+        options: [
+          { key: 'A', text: '$7,500,000' },
+          { key: 'B', text: '$5,938,800' },
+          { key: 'C', text: '$3,030,000' },
+          { key: 'D', text: '$2,908,800' }
+        ],
+        correct: 'B',
+        explanation: `Initial provision &amp; capitalised asset at 31 Dec 20X6 = $60,000,000 × 0.404 = $24,240,000.<br>• Depreciation (20X7): $24,240,000 ÷ 8 years = $3,030,000.<br>• Finance cost (unwinding @ 12%): $24,240,000 × 12% = $2,908,800.<br>• Total P&amp;L charge = $3,030,000 + $2,908,800 = <strong>$5,938,800</strong>.`
+      },
+      {
+        num: 10, section: 'A', type: 'multi', selectCount: 2, topic: 'IAS 20 Grants', marks: 2,
+        stem: `<p class="mb-3">Theo Co acquired new plant on 1 January 20X3 for $6m. This was partly funded by the receipt of a $2m government grant on the same date. The plant has a useful life of ten years. Theo Co is unsure whether to deduct the grant to calculate the carrying amount of the plant or to use the deferred income method.</p><p class="font-semibold text-slate-900">Based on the different ways to account for government grants, which TWO of the following options can be recognised in the statement of financial position as at 31 December 20X3?</p>`,
+        options: [
+          { key: 'A', text: 'Non-current asset of $3.6m' },
+          { key: 'B', text: 'Non-current liability of $1.8m' },
+          { key: 'C', text: 'Non-current asset of $4m' },
+          { key: 'D', text: 'Non-current liability of $1.6m' }
+        ],
+        correct: ['A', 'D'],
+        explanation: `• <strong>Deduct from asset method:</strong> Net cost = $6m − $2m = $4m. After 1 year's depreciation ($0.4m), Non-current asset = <strong>$3.6m (A)</strong>.<br>• <strong>Deferred income method:</strong> Total deferred income at 31 Dec 20X3 = $2m − $0.2m = $1.8m, split into Current liability ($0.2m) and <strong>Non-current liability of $1.6m (D)</strong>.`
+      },
+      {
+        num: 11, section: 'A', type: 'mcq', topic: 'IAS 21 Foreign Exchange', marks: 2,
+        stem: `<p class="mb-3">On 1 January 20X7 Vega took out a loan of Zenar 1.5 million. Vega's functional currency is the dollar. The loan is to be repaid in 10 equal instalments of Zenar 150,000 on 31 December each year, the first being on 31 December 20X7. Exchange rates are as follows:</p>
+          <table class="cbe-table max-w-md">
+            <tbody>
+              <tr><td>1 January 20X7</td><td>Zenar 1 = $1.85</td></tr>
+              <tr><td>31 December 20X7</td><td>Zenar 1 = $1.92</td></tr>
+            </tbody>
+          </table>
+          <p class="font-semibold text-slate-900 mt-3">What is the carrying amount of the non-current liability in Vega's statement of financial position as at 31 December 20X7?</p>`,
+        options: [
+          { key: 'A', text: '$2,497,500' },
+          { key: 'B', text: '$2,304,000' },
+          { key: 'C', text: '$2,592,000' },
+          { key: 'D', text: '$2,220,000' }
+        ],
+        correct: 'B',
+        explanation: `• Remaining loan at 31 Dec 20X7 after 1st instalment = Z1,500,000 − Z150,000 = Z1,350,000.<br>• Current liability (instalment due 31 Dec 20X8) = Z150,000.<br>• Non-current liability = Z1,200,000.<br>• Monetary liabilities are retranslated at the closing rate ($1.92): Z1,200,000 × $1.92 = <strong>$2,304,000</strong>.`
+      },
+      {
+        num: 12, section: 'A', type: 'mcq', topic: 'IAS 21 Foreign Exchange', marks: 2,
+        stem: `<p class="mb-3">IAS 21 <em>The Effects of Changes in Foreign Exchange Rates</em> distinguishes between functional currency and presentation currency.</p>
+          <p class="font-semibold text-slate-900 mb-2">Which of the following statements regarding presentation currency is/are correct in accordance with IAS 21?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>(1) An entity may choose to present its financial statements in a currency other than its functional currency</li>
+            <li>(2) The presentation currency is the currency of the primary economic environment in which the entity operates</li>
+            <li>(3) Where foreign currency exchange rates fluctuate significantly, an entity should translate a foreign currency transaction using the exchange rate that exists on the date of the transaction</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '2 only' },
+          { key: 'B', text: '1 and 3 only' },
+          { key: 'C', text: '1 only' },
+          { key: 'D', text: '2 and 3' }
+        ],
+        correct: 'B',
+        explanation: `• Statement (1) is <strong>correct</strong> (IAS 21.38).<br>• Statement (2) is <strong>incorrect</strong> — that is the definition of <em>functional</em> currency.<br>• Statement (3) is <strong>correct</strong> — average rates are not appropriate when exchange rates fluctuate significantly (IAS 21.22).`
+      },
+      {
+        num: 13, section: 'A', type: 'mcq', topic: 'IAS 33 EPS', marks: 2,
+        stem: `<p class="mb-3">Kallott Co's issued share capital has remained at 20 million ordinary (equity) shares for many years. On 1 March 20X7, it made a one-for-four issue of bonus shares.</p>
+          <p class="mb-3">The profit attributable to the ordinary shareholders for the year ended 31 May 20X7 was $36m and, for the year ended 31 May 20X6, was $27m.</p>
+          <p class="font-semibold text-slate-900">What basic earnings per share amounts will be reported for the year ended 31 May 20X7?</p>`,
+        options: [
+          { key: 'A', text: '$1.44 (20X6: $1.35)' },
+          { key: 'B', text: '$1.69 (20X6: $1.08)' },
+          { key: 'C', text: '$1.69 (20X6: $1.35)' },
+          { key: 'D', text: '$1.44 (20X6: $1.08)' }
+        ],
+        correct: 'D',
+        explanation: `Under <strong>IAS 33</strong>, a bonus issue is treated as if it had occurred at the start of the earliest period presented.<br>• Total shares = 20m × 5/4 = 25m shares.<br>• 20X7 Basic EPS = $36m ÷ 25m = <strong>$1.44</strong>.<br>• 20X6 Restated Basic EPS = $27m ÷ 25m = <strong>$1.08</strong>.`
+      },
+      {
+        num: 14, section: 'A', type: 'mcq', topic: 'IAS 33 EPS', marks: 2,
+        stem: `<p class="mb-3">Kite Co made a profit for the year ended 31 December 20X8 of $1,820,000. At 1 January 20X8 it had 4,000,000 shares in issue. On 1 April 20X8 it made a bonus issue of 1 share for every 4 held. On 1 September 20X8 it issued 600,000 shares at full market price.</p><p class="font-semibold text-slate-900">What is the basic earnings per share for the year?</p>`,
+        options: [
+          { key: 'A', text: '31.4 cents' },
+          { key: 'B', text: '36.4 cents' },
+          { key: 'C', text: '35.0 cents' },
+          { key: 'D', text: '45.5 cents' }
+        ],
+        correct: 'C',
+        explanation: `Weighted average number of shares (WANOS):<br>• 1 Jan – 31 Aug (8 months, adjusted for 1-for-4 bonus): 4,000,000 × 5/4 × 8/12 = 3,333,333.<br>• 1 Sep – 31 Dec (4 months): 5,600,000 × 4/12 = 1,866,667.<br>• Total WANOS = 5,200,000 shares.<br>• Basic EPS = $1,820,000 ÷ 5,200,000 = $0.35 = <strong>35.0 cents</strong>.`
+      },
+      {
+        num: 15, section: 'A', type: 'mcq', topic: 'IAS 12 Deferred Tax', marks: 2,
+        stem: `<p class="mb-2">The following relates to Mason Co.</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-3">
+            <li>(i) At 1 January 20X9 the carrying amount of non-current assets exceeded their tax base by $600,000.</li>
+            <li>(ii) For the year ended 31 December 20X9 tax depreciation was $400,000 and accounting depreciation was $300,000.</li>
+            <li>(iii) During the year a property was revalued upwards by $200,000. There is no plan to sell it.</li>
+            <li>(iv) The tax rate is 25%.</li>
+          </ol>
+          <p class="font-semibold text-slate-900">What is the deferred tax liability required by IAS 12 at 31 December 20X9?</p>`,
+        options: [
+          { key: 'A', text: '$225,000' },
+          { key: 'B', text: '$175,000' },
+          { key: 'C', text: '$200,000' },
+          { key: 'D', text: '$250,000' }
+        ],
+        correct: 'A',
+        explanation: `Taxable temporary differences at 31 Dec 20X9:<br>• Opening: $600,000<br>• Excess of tax depreciation over accounting depreciation ($400k − $300k): +$100,000<br>• Upward revaluation (IAS 12 requires DT even with no plan to sell): +$200,000<br>• Total = $900,000 × 25% = <strong>$225,000</strong>.`
+      },
+      // SECTION B — GRINNIT CO (Q16-Q20)
+      {
+        num: 16, section: 'B', scenarioId: 'grinnit', type: 'tf_matrix', topic: 'IAS 12 Deferred Tax', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">In accordance with IAS 12 <em>Income Taxes</em>, identify which of the following statements are true or false. (Select one option in each row.)</p>`,
+        rows: [
+          { id: 'r1', text: 'Deferred tax takes account of temporary differences', correct: 'True' },
+          { id: 'r2', text: 'Deferred tax liabilities are discounted to present value and the discount is unwound over time', correct: 'False' },
+          { id: 'r3', text: 'A revaluation of land will have no impact on the deferred tax liability', correct: 'False' }
+        ],
+        explanation: `• Row 1: <strong>True</strong> — IAS 12 uses the temporary difference (balance sheet) approach.<br>• Row 2: <strong>False</strong> — IAS 12.53 explicitly prohibits discounting deferred tax assets and liabilities.<br>• Row 3: <strong>False</strong> — Revaluation of land creates a taxable temporary difference, increasing the deferred tax liability (debited to OCI).`
+      },
+      {
+        num: 17, section: 'B', scenarioId: 'grinnit', type: 'mcq', topic: 'IAS 12 Deferred Tax', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">In respect of Grinnit Co's net assets and excluding the revaluation of land, what is the manual journal entry required to recognise the movement in the deferred tax liability for the year ended 31 October 20X7?</p>`,
+        options: [
+          { key: 'A', text: 'Dr Income tax expense $8,000; Cr Deferred tax liability $8,000' },
+          { key: 'B', text: 'Dr Income tax expense $54,000; Cr Deferred tax liability $54,000' },
+          { key: 'C', text: 'Dr Deferred tax liability $8,000; Cr Income tax expense $8,000' },
+          { key: 'D', text: 'Dr Deferred tax liability $54,000; Cr Income tax expense $54,000' }
+        ],
+        correct: 'C',
+        explanation: `• Opening DTL (1 Nov 20X6) = $62,000.<br>• Closing DTL excl. land revaluation (31 Oct 20X7) = $180,000 × 30% = $54,000.<br>• Decrease in DTL = $62,000 − $54,000 = $8,000 → <strong>Dr Deferred tax liability $8,000; Cr Income tax expense $8,000</strong>.`
+      },
+      {
+        num: 18, section: 'B', scenarioId: 'grinnit', type: 'mcq', topic: 'IAS 16 PPE', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">In accordance with IAS 16 <em>Property, Plant and Equipment</em>, what is the manual journal entry required to revalue the land (ignore deferred tax)?</p>`,
+        options: [
+          { key: 'A', text: 'Dr Revaluation surplus; Cr Land' },
+          { key: 'B', text: 'Dr Land; Cr Revaluation surplus' },
+          { key: 'C', text: 'Dr Land; Cr Investment income' },
+          { key: 'D', text: 'Dr Investment income; Cr Land' }
+        ],
+        correct: 'B',
+        explanation: `The land increased in value from $240,000 to $300,000 (+$60,000). Under IAS 16.39, an upward revaluation is recognised in OCI and accumulated in equity: <strong>Dr Land; Cr Revaluation surplus</strong>.`
+      },
+      {
+        num: 19, section: 'B', scenarioId: 'grinnit', type: 'number', topic: 'IAS 12 & IAS 16', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Including the deferred tax effect of the land revaluation, what is the balance of the revaluation surplus at 1 August 20X7 (to the nearest $'000)?</p>`,
+        prefix: '$', suffix: ',000',
+        accepted: ['42', '42.0'],
+        displayCorrect: '$42,000 (enter 42)',
+        explanation: `• Revaluation gain = $300,000 − $240,000 = $60,000.<br>• Less deferred tax at 30% = $60,000 × 30% = $18,000 (debited to OCI/revaluation surplus).<br>• Net revaluation surplus = $60,000 − $18,000 = <strong>$42,000</strong> (enter <strong>42</strong>).`
+      },
+      {
+        num: 20, section: 'B', scenarioId: 'grinnit', type: 'mcq', topic: 'IAS 16 PPE', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">In accordance with IAS 16 <em>Property, Plant and Equipment</em>, which of the following statements is/are true?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>(1) Grinnit Co has changed its accounting policy for measuring land to the revaluation model. All items of property, plant and equipment must now be revalued</li>
+            <li>(2) If Grinnit Co revalued its property upwards for the first time, transfers may be made from the revaluation surplus to retained earnings as the asset is used</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '1 only' },
+          { key: 'B', text: '2 only' },
+          { key: 'C', text: 'Both 1 and 2' },
+          { key: 'D', text: 'Neither 1 nor 2' }
+        ],
+        correct: 'B',
+        explanation: `• Statement (1) is <strong>false</strong> — IAS 16.36 requires only the entire <em>class</em> of PPE (i.e. all land) to be revalued, not all PPE.<br>• Statement (2) is <strong>true</strong> — IAS 16.41 permits an annual reserve transfer of excess depreciation from revaluation surplus to retained earnings.`
+      },
+      // SECTION B — GAMMON CO (Q21-Q25)
+      {
+        num: 21, section: 'B', scenarioId: 'gammon', type: 'mcq', topic: 'IFRS 5 Discontinued Ops', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">Assuming it has been sold in the reporting period, which of the following would meet the definition of a discontinued operation in accordance with IFRS 5 <em>Non-current Assets Held for Sale and Discontinued Operations</em>?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>(1) A component of an entity that represents a separate major line of business</li>
+            <li>(2) An associate acquired exclusively with a view of resale</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '1 only' },
+          { key: 'B', text: '2 only' },
+          { key: 'C', text: 'Both 1 and 2' },
+          { key: 'D', text: 'Neither 1 nor 2' }
+        ],
+        correct: 'A',
+        explanation: `Under <strong>IFRS 5.32</strong>, a discontinued operation includes a separate major line of business (1), or a <em>subsidiary</em> acquired exclusively with a view to resale — NOT an associate (2).`
+      },
+      {
+        num: 22, section: 'B', scenarioId: 'gammon', type: 'mcq', topic: 'IFRS 5 Discontinued Ops', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">Assuming it has been sold in the reporting period, which of the following should be disclosed in accordance with IFRS 5 <em>Non-current Assets Held for Sale and Discontinued Operations</em>?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>(1) The gain or loss recognised on the measurement or on the disposal of the assets</li>
+            <li>(2) The post-tax profit or loss of discontinued operations</li>
+            <li>(3) The related income tax expense on any taxable gains or profits</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '1 only' },
+          { key: 'B', text: '1 and 3' },
+          { key: 'C', text: '2 and 3' },
+          { key: 'D', text: '1, 2 and 3' }
+        ],
+        correct: 'D',
+        explanation: `<strong>IFRS 5.33</strong> requires disclosure of the post-tax profit/loss of discontinued operations, the post-tax gain/loss on measurement or disposal, and an analysis showing the related income tax expense (all three items).`
+      },
+      {
+        num: 23, section: 'B', scenarioId: 'gammon', type: 'mcq', topic: 'IFRS 5 Held for Sale', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">At what amount should the Garden Furniture division be measured in the statement of financial position as at 31 October 20X4?</p>`,
+        options: [
+          { key: 'A', text: '$20.01m' },
+          { key: 'B', text: '$24.90m' },
+          { key: 'C', text: '$26.94m' },
+          { key: 'D', text: '$31.35m' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IFRS 5.15</strong>, a disposal group held for sale is measured at the lower of carrying amount ($31,350k) and fair value less costs to sell ($26,940k − $2,040k = $24,900k = <strong>$24.90m</strong>). Value in use is ignored once classified as held for sale.`
+      },
+      {
+        num: 24, section: 'B', scenarioId: 'gammon', type: 'mcq', topic: 'IAS 33 EPS', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">What is the weighted average number of shares to be applied when calculating basic earnings per share for the year ended 31 October 20X4?</p>`,
+        options: [
+          { key: 'A', text: '64.5m' },
+          { key: 'B', text: '74.5m' },
+          { key: 'C', text: '75.0m' },
+          { key: 'D', text: '79.5m' }
+        ],
+        correct: 'D',
+        explanation: `• 1 Nov 20X3 – 31 Jul 20X4 (9 months, incl. 1-for-4 bonus): 60m × 5/4 × 9/12 = 56.25m.<br>• 1 Aug 20X4 – 31 Oct 20X4 (3 months, after +18m market issue → 93m): 93m × 3/12 = 23.25m.<br>• Total WANOS = 56.25m + 23.25m = <strong>79.5m</strong>.`
+      },
+      {
+        num: 25, section: 'B', scenarioId: 'gammon', type: 'mcq', topic: 'IAS 33 Diluted EPS', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">What are the earnings to be applied when calculating diluted earnings per share from continuing operations for the year ended 31 October 20X4?</p>`,
+        options: [
+          { key: 'A', text: '$105.00m' },
+          { key: 'B', text: '$107.64m' },
+          { key: 'C', text: '$104.76m' },
+          { key: 'D', text: '$108.60m' }
+        ],
+        correct: 'C',
+        explanation: `• Basic continuing earnings = $103.80m.<br>• Convertible loan notes ($60m @ 8%) were in issue for <strong>3 months</strong> (1 Aug to 31 Oct 20X4).<br>• Interest saved (pre-tax) = $60m × 8% × 3/12 = $1.20m.<br>• Post-tax interest saved (20% tax) = $1.20m × 80% = $0.96m.<br>• Diluted earnings = $103.80m + $0.96m = <strong>$104.76m</strong>.`
+      },
+      // SECTION B — SHAWLER CO (Q26-Q30)
+      {
+        num: 26, section: 'B', scenarioId: 'shawler', type: 'mcq', topic: 'IAS 16 Components', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">What is the total charge for depreciation relating to the furnace for the year ended 30 September 20X6? (Assume the government grant is accounted for using the deferred income method.)</p>`,
+        options: [
+          { key: 'A', text: '$6,200' },
+          { key: 'B', text: '$7,000' },
+          { key: 'C', text: '$8,000' },
+          { key: 'D', text: '$11,890' }
+        ],
+        correct: 'C',
+        explanation: `Under the deferred income method, the grant does not reduce asset cost. Depreciate each component separately (IAS 16.43):<br>• Main body: $42,000 ÷ 10 yrs = $4,200<br>• Replaceable liner: $10,000 ÷ 5 yrs = $2,000<br>• Capitalised decommissioning cost (PV): $18,000 ÷ 10 yrs = $1,800<br>• Total depreciation = $4,200 + $2,000 + $1,800 = <strong>$8,000</strong>.`
+      },
+      {
+        num: 27, section: 'B', scenarioId: 'shawler', type: 'number', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Calculate the amount that should be recognised in the statement of financial position as at 30 September 20X6 in respect of the clean-up costs.</p>`,
+        prefix: '$', suffix: '(nearest whole number)',
+        accepted: ['19440'],
+        displayCorrect: '$19,440',
+        explanation: `• Provision at 1 Oct 20X5 = $18,000.<br>• Unwinding of discount for 1 year @ 8% = $18,000 × 8% = $1,440.<br>• Closing provision at 30 Sep 20X6 = $18,000 + $1,440 = <strong>$19,440</strong>. (The 33% reduction is NOT recognised because filters have not yet been fitted.)`
+      },
+      {
+        num: 28, section: 'B', scenarioId: 'shawler', type: 'mcq', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">In respect of the amount recognised for restoration and clean-up costs, which of the following statements are correct?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>I &nbsp; The amount must be the best estimate of the expenditure required to settle the obligation at 30 September 20X6</li>
+            <li>II &nbsp; In measuring the provision, Shawler Co should take into account any evidence provided by events after the reporting period</li>
+            <li>III &nbsp; Any expected future changes in technology should be taken into account in making the estimate, if there is sufficient objective evidence that they will occur</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: 'I and II' },
+          { key: 'B', text: 'I and III' },
+          { key: 'C', text: 'II and III' },
+          { key: 'D', text: 'All three statements' }
+        ],
+        correct: 'D',
+        explanation: `All three statements comply with <strong>IAS 37</strong>: best estimate at the reporting date (IAS 37.36), incorporating adjusting events after the reporting period (IAS 37.38 / IAS 10), and expected future technological changes where sufficient objective evidence exists (IAS 37.49).`
+      },
+      {
+        num: 29, section: 'B', scenarioId: 'shawler', type: 'multi', selectCount: 2, topic: 'IAS 20 Grants', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">In respect of the government grant, which TWO of the following accounting treatments can Shawler Co adopt?</p>`,
+        options: [
+          { key: 'A', text: 'Deduct the grant from the cost of the furnace and depreciate the net amount of the asset over five years' },
+          { key: 'B', text: 'Deduct the grant from the cost of the furnace and depreciate the net amount of the asset over ten years' },
+          { key: 'C', text: 'Recognise the grant in profit or loss in the period in which it is received' },
+          { key: 'D', text: 'Recognise a liability for deferred income and then release the liability to profit or loss in equal instalments over the useful life of the furnace' },
+          { key: 'E', text: 'Recognise a liability for deferred income and recognise a gain in profit or loss when the furnace is dismantled and the clean-up operation has taken place' }
+        ],
+        correct: ['B', 'D'],
+        explanation: `The grant relates to the <em>main body</em> of the furnace (10-year useful life). Under <strong>IAS 20.24</strong>, an entity may either deduct the grant from the asset's carrying amount and depreciate over 10 years (<strong>B</strong>), or recognise deferred income and release it over the useful life (<strong>D</strong>).`
+      },
+      {
+        num: 30, section: 'B', scenarioId: 'shawler', type: 'mcq', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">In respect of the new legislation requiring Shawler Co to fit anti-pollution filters, which of the following statements is correct?</p>`,
+        options: [
+          { key: 'A', text: 'No provision should be made at 30 September 20X6, because there is no past obligating event' },
+          { key: 'B', text: 'Shawler should recognise a provision at 30 September 20X6, because the legislation has been passed and this creates an obligation' },
+          { key: 'C', text: 'Shawler should not recognise a provision for the cost of fitting the filters, but it should disclose a contingent liability for a possible fine' },
+          { key: 'D', text: 'The existing environmental provision should be reduced by 33%, to reflect the effect of fitting the filters, even though no provision is required in the current year' }
+        ],
+        correct: 'A',
+        explanation: `Under <strong>IAS 37 (Illustrative Example 6)</strong>, there is no present obligation at 30 Sep 20X6 because Shawler Co can avoid the future expenditure by changing its method of operation or ceasing to operate the furnace before the two-year deadline.`
+      }
+    ]
+  },
+  // ==========================================================================
+  // EXAM 2: FR WEEKLY TEST (SEPT 2026)
+  // ==========================================================================
+  {
+    id: 'exam2',
+    code: 'FR-WEEKLY-SEP26',
+    title: 'Financial Reporting (FR) — Weekly Test',
+    subtitle: 'BCOM ACCA FR B1 • 24 Sept 2026 • Indian Institute of Commerce Lakshya',
+    totalQuestions: 30,
+    totalMarks: 60,
+    marksPerQuestion: 2,
+    accaMinutes: 108, // ACCA Standard: 1.8 mins per mark (180 mins / 100 marks)
+    paperMinutes: 60,  // Stated on paper
+    sections: [
+      { id: 'A', name: 'Section A — Objective Test Questions', range: [1, 18], description: '18 individual questions (2 marks each = 36 marks)' },
+      { id: 'B', name: 'Section B — Objective Test Case Scenarios', range: [19, 30], description: '3 scenarios (12 questions × 2 marks each = 24 marks)' }
+    ],
+    scenarios: {
+      annie: {
+        id: 'annie',
+        title: 'Scenario 1 – Annie (Leases)',
+        rangeLabel: 'Questions 19 – 23',
+        topic: 'IFRS 16 Leases',
+        html: `
+          <p class="font-semibold text-slate-900 mb-3">Questions 19 to 23 are based on the following scenario.</p>
+          <p class="mb-3">Annie has entered into the following transaction during the year ended 30 June 20X7:</p>
+          <p class="mb-1">Annie leased an item of plant on <strong>1 July 20X6</strong>. The asset has a useful life of <strong>four years</strong> and is to be leased for <strong>three years</strong>, with <strong>$225,000</strong> payable annually in arrears. The present value of the lease payments is <strong>$560,000</strong> and the rate of interest implicit in the lease is <strong>10%</strong>. At the end of the lease, <strong>ownership of the asset will pass to Annie</strong>.</p>
+        `
+      },
+      pup: {
+        id: 'pup',
+        title: 'Scenario 2 – Pup (Investment Property, Grants and Provisions)',
+        rangeLabel: 'Questions 24 – 28',
+        topic: 'IAS 40, IAS 20 & IAS 37',
+        html: `
+          <p class="font-semibold text-slate-900 mb-3">Questions 24 to 28 are based on the following scenario.</p>
+          <p class="mb-3">Pup has the following transactions in its financial statements for the year ended 31 December 20X8:</p>
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>Pup purchased an investment property on <strong>1 January 20X8</strong> for <strong>$5.2 million</strong>. Its useful life at that date was estimated as 25 years. This is the first time Pup has held such a property. As at 31 December 20X8, the property has a market value of <strong>$5.5 million</strong>.</li>
+            <li>Pup received a government grant on <strong>1 January 20X8</strong> of <strong>$30,000</strong> in relation to capital expenditure on plant of <strong>$320,000</strong>. This plant will be depreciated at a rate of <strong>10% per annum</strong> on a straight line basis, with no residual value.</li>
+            <li>Pup is due to open a mine at the start of 20X9. At the end of the 20 year life of the mine, the equipment used will need to be dismantled, at a total cost of <strong>$45 million</strong>. Pup's cost of capital is 8% and this gives a present value of <strong>22¢ per $1</strong> in 20 years' time.</li>
+          </ol>
+        `
+      },
+      reef: {
+        id: 'reef',
+        title: 'Scenario 3 – Reef (Cash Flow Extracts)',
+        rangeLabel: 'Questions 29 – 30',
+        topic: 'IAS 7 & Non-current Assets',
+        html: `
+          <p class="font-semibold text-slate-900 mb-3">Questions 29 to 30 are based on the following scenario.</p>
+          <p class="mb-3">Reef has the following extracted information in its statement of profit or loss and statement of financial position for the years ended 30 June 20X3 and 30 June 20X2:</p>
+          <p class="font-semibold text-slate-900 mb-1">Statement of profit or loss extract – 30 June 20X3</p>
+          <p class="text-sm text-slate-600 mb-2">Profit from operations is after charging:</p>
+          <table class="cbe-table">
+            <thead>
+              <tr><th>Item</th><th class="num">$000</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Depreciation</td><td class="num">3,000</td></tr>
+              <tr><td>Loss on disposal of asset</td><td class="num">1,500</td></tr>
+              <tr><td>Taxation</td><td class="num">900</td></tr>
+            </tbody>
+          </table>
+          <p class="font-semibold text-slate-900 mt-4 mb-2">Statement of financial position extract</p>
+          <table class="cbe-table">
+            <thead>
+              <tr><th>Item</th><th class="num">30 June 20X3 ($000)</th><th class="num">30 June 20X2 ($000)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Property, plant and equipment</td><td class="num">27,000</td><td class="num">32,000</td></tr>
+              <tr><td>Intangible assets</td><td class="num">13,000</td><td class="num">11,500</td></tr>
+              <tr><td>Deferred tax</td><td class="num">1,800</td><td class="num">1,500</td></tr>
+              <tr><td>Current tax</td><td class="num">950</td><td class="num">875</td></tr>
+            </tbody>
+          </table>
+        `
+      }
+    },
+    questions: [
+      {
+        num: 1, section: 'A', type: 'number', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="mb-2">Dess Co entered into a four-year lease on 1 January 20X4. Payments were $2,000 per annum in arrears on 31 December each year and the present value of the future lease payments at 1 January 20X4 was $7,100. The interest rate implicit in the lease was 5%.</p><p class="font-semibold text-slate-900">What is the amount of Dess Co's current liability for the lease liability as at 31 December 20X4 (to the nearest $)?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['1727'],
+        displayCorrect: '$1,727',
+        explanation: `• Year 1 (20X4): $7,100 + 5% ($355) − $2,000 = $5,455 (total liability at 31 Dec 20X4).<br>• Year 2 (20X5): $5,455 + 5% ($272.75) − $2,000 = $3,727.75 (non-current liability at 31 Dec 20X4).<br>• Current liability at 31 Dec 20X4 = $5,455 − $3,727.75 = $1,727.25 ≈ <strong>$1,727</strong>.`
+      },
+      {
+        num: 2, section: 'A', type: 'multi', selectCount: 2, topic: 'IAS 16 PPE', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-1">In relation to the revaluation of non-current assets, which TWO of the following are correct in accordance with IAS 16 <em>Property, Plant and Equipment</em>?</p><p class="text-sm italic text-slate-600">(Select TWO answers.)</p>`,
+        options: [
+          { key: 'A', text: 'Transfers from revaluation surplus to retained earnings are made through profit or loss.' },
+          { key: 'B', text: 'A revaluation surplus arises when a non-current asset is sold at a profit.' },
+          { key: 'C', text: 'The revaluation surplus is part of equity in the statement of financial position.' },
+          { key: 'D', text: 'The frequency of revaluation depends on any volatility in the fair value of the asset.' }
+        ],
+        correct: ['C', 'D'],
+        explanation: `• <strong>C</strong> is correct: revaluation surplus is an equity reserve.<br>• <strong>D</strong> is correct (IAS 16.34): frequency depends on changes in fair values.<br>• A is false (reserve transfers go directly through SOCIE, never P&amp;L). B is false (profit on sale goes to P&amp;L).`
+      },
+      {
+        num: 3, section: 'A', type: 'dropdown_table', topic: 'IAS 20 Grants', marks: 2,
+        stem: `<p class="mb-3">Parred Co buys new equipment on 1 May 20X5 at a cost of $500,000. Depreciation is 20% per annum straight line and the asset has no residual value.</p>
+          <p class="mb-3">The company received a government grant of $150,000 in respect of the equipment. The company has received the cash and recognised the grant as deferred income.</p>
+          <p class="font-semibold text-slate-900">What amounts will be included in the financial statements for the year ended 30 April 20X6 in respect of the above transactions?</p>`,
+        headers: ['Financial statement', 'Amount'],
+        rows: [
+          { id: 'pl', label: 'Profit or loss', options: ['$100,000 Dr', '$100,000 Cr', '$90,000 Cr', '$70,000 Dr', '$70,000 Cr', '$30,000 Cr'], correct: '$70,000 Dr' },
+          { id: 'cl', label: 'Current liabilities', options: ['$100,000 Dr', '$100,000 Cr', '$90,000 Cr', '$70,000 Dr', '$70,000 Cr', '$30,000 Cr'], correct: '$30,000 Cr' }
+        ],
+        explanation: `• Depreciation = $500,000 × 20% = $100,000 Dr.<br>• Grant released to P&amp;L = $150,000 × 20% = $30,000 Cr.<br>• Net P&amp;L charge = $100,000 Dr − $30,000 Cr = <strong>$70,000 Dr</strong>.<br>• Current liability = next 12 months' deferred income release = <strong>$30,000 Cr</strong> (remaining $90,000 is non-current liability).`
+      },
+      {
+        num: 4, section: 'A', type: 'mcq', topic: 'IAS 38 Intangibles', marks: 2,
+        stem: `<p class="mb-3">Teent Co has capitalised development costs of $6m relating to 'Project Atlantic' in its statement of financial position as at 31 December 20X2. The company began selling the product in 20X3 and has reliably estimated the following expected unit sales:</p>
+          <table class="cbe-table max-w-sm">
+            <thead><tr><th>Year</th><th class="num">Sales (units)</th></tr></thead>
+            <tbody>
+              <tr><td>20X3</td><td class="num">144,000</td></tr>
+              <tr><td>20X4</td><td class="num">120,000</td></tr>
+              <tr><td>20X5</td><td class="num">96,000</td></tr>
+              <tr class="font-semibold bg-slate-50"><td>Total</td><td class="num">360,000</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 font-semibold text-slate-900">There will be no sales after 20X5. What amount should be charged to the statement of profit or loss for the year ended 31 December 20X3 in respect of the development costs?</p>`,
+        options: [
+          { key: 'A', text: '$0' },
+          { key: 'B', text: '$2m' },
+          { key: 'C', text: '$2.4m' },
+          { key: 'D', text: '$6m' }
+        ],
+        correct: 'C',
+        explanation: `Under <strong>IAS 38</strong>, amortisation reflects the pattern in which economic benefits are consumed: $6m × (144,000 / 360,000) = <strong>$2.4m</strong>.`
+      },
+      {
+        num: 5, section: 'A', type: 'mcq', topic: 'IAS 40 Investment Property', marks: 2,
+        stem: `<p class="mb-3">Bandera Co held an investment property until 1 January 20X2, when the use was changed to an owner-occupied property.</p>
+          <p class="mb-3">The fair value model was applied to the investment property and its fair value at 31 October 20X1 was $7.1m. On the date of the change of use, the property's fair value was $8.6m and the remaining useful life was 16 years.</p>
+          <p class="mb-3">It is the company's policy to charge depreciation using the straight-line method, on a monthly basis.</p>
+          <p class="font-semibold text-slate-900">What, to the nearest $000, is the net effect of any required adjustments in Bandera Co's statement of profit or loss for the year ended 31 October 20X2?</p>`,
+        options: [
+          { key: 'A', text: '$1,948,000 Cr' },
+          { key: 'B', text: '$1,052,000 Dr' },
+          { key: 'C', text: '$1,948,000 Dr' },
+          { key: 'D', text: '$1,052,000 Cr' }
+        ],
+        correct: 'D',
+        explanation: `• Fair value gain on transfer (1 Jan 20X2) under IAS 40 FV model: $8.6m − $7.1m = $1,500,000 Cr to P&amp;L.<br>• Depreciation as PPE from 1 Jan 20X2 to 31 Oct 20X2 (10 months): ($8,600,000 ÷ 16) × 10/12 = $447,917 Dr.<br>• Net effect in P&amp;L = $1,500,000 Cr − $447,917 Dr = $1,052,083 Cr ≈ <strong>$1,052,000 Cr</strong>.`
+      },
+      {
+        num: 6, section: 'A', type: 'number', topic: 'IAS 16 & IAS 37', marks: 2,
+        stem: `<p class="mb-3">On 1 February 20X6, Osmond Co acquired specialist mining equipment at a cost of $50m. The equipment has a useful life of five years and the company must decommission the equipment at the end of the five year period. The estimated cost of this decommissioning in five years' time is $9m. Osmond Co's cost of capital is 14% per annum. The relevant five-year discount factor is 0.519.</p>
+          <p class="mb-2">Osmond Co correctly recognised the equipment and provision for decommissioning costs on 1 February 20X6. No further accounting has been performed.</p>
+          <p class="font-semibold text-slate-900">In relation to the asset and provision, what is the total expense that should be charged to the statement of profit or loss for the year ended 31 January 20X7 (to the nearest $'000)?</p>`,
+        prefix: '$', suffix: ',000',
+        accepted: ['11588'],
+        displayCorrect: '$11,588,000 (enter 11588)',
+        explanation: `• PV of decommissioning = $9,000k × 0.519 = $4,671k.<br>• Total PPE cost = $50,000k + $4,671k = $54,671k.<br>• Depreciation = $54,671k ÷ 5 = $10,934.2k.<br>• Finance cost (unwinding @ 14%) = $4,671k × 14% = $653.94k.<br>• Total P&amp;L expense = $10,934.2k + $653.94k = $11,588.14k ≈ <strong>$11,588</strong> (in $'000).`
+      },
+      {
+        num: 7, section: 'A', type: 'mcq', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="mb-3">A company entered into a four-year lease on 1 January 20X0. The present value of the future lease payments at that date was $950,000 and lease payments of $300,000 were to be made annually in arrears. The interest rate implicit in the lease was 10%.</p><p class="font-semibold text-slate-900">What amount should be shown as a current liability as at 31 December 20X0?</p>`,
+        options: [
+          { key: 'A', text: '$225,500' },
+          { key: 'B', text: '$745,000' },
+          { key: 'C', text: '$519,500' },
+          { key: 'D', text: '$300,000' }
+        ],
+        correct: 'A',
+        explanation: `• 31 Dec 20X0 closing liability = $950,000 × 1.10 − $300,000 = $745,000.<br>• 31 Dec 20X1 closing liability (NCL at 31 Dec 20X0) = $745,000 × 1.10 − $300,000 = $519,500.<br>• Current liability at 31 Dec 20X0 = $745,000 − $519,500 = <strong>$225,500</strong>.`
+      },
+      {
+        num: 8, section: 'A', type: 'number', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="mb-3">On 1 July 20X1, Rep Co entered into a five-year lease for an item of equipment. Under the terms of the lease, Rep Co will pay $1m per annum on 30 June. The lease has an implicit interest rate of 9% and the present value of the lease payments at 1 July 20X1 is $3.89m.</p><p class="font-semibold text-slate-900">What is the TOTAL expense to be recorded in the statement of profit or loss for the year ended 31 December 20X1 in respect of the lease liability and the right-of-use asset?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['564050'],
+        displayCorrect: '$564,050',
+        explanation: `Lease started 1 July 20X1 → <strong>6 months</strong> to 31 December 20X1:<br>• Depreciation = ($3,890,000 ÷ 5 yrs) × 6/12 = $389,000.<br>• Finance cost = ($3,890,000 × 9%) × 6/12 = $175,050.<br>• Total P&amp;L expense = $389,000 + $175,050 = <strong>$564,050</strong>.`
+      },
+      {
+        num: 9, section: 'A', type: 'mcq', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="mb-3">Shaba Co entered into a lease for a right-of-use asset on 1 January 20X7. The lease contract is for four years and the useful life is 8 years, as follows:</p>
+          <table class="cbe-table max-w-md">
+            <thead><tr><th>Item</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Initial lease liability</td><td class="num">$48,000</td></tr>
+              <tr><td>Deposit paid on 1 January 20X7</td><td class="num">$2,000</td></tr>
+              <tr><td>Direct costs incurred by Shaba</td><td class="num">$5,000</td></tr>
+              <tr><td>Maintenance costs of $2,000 per annum</td><td class="num">$8,000</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 font-semibold text-slate-900">What will be the carrying amount of the right-of-use asset at 31 December 20X8?</p>`,
+        options: [
+          { key: 'A', text: '$41,250' },
+          { key: 'B', text: '$31,500' },
+          { key: 'C', text: '$27,500' },
+          { key: 'D', text: '$36,667' }
+        ],
+        correct: 'C',
+        explanation: `• Initial ROU asset = $48,000 + $2,000 + $5,000 = $55,000 (maintenance costs are expensed as incurred).<br>• Depreciate over shorter of lease term (4 yrs) and useful life (8 yrs) = 4 years ($13,750/yr).<br>• Carrying amount at 31 Dec 20X8 (after 2 years) = $55,000 − (2 × $13,750) = <strong>$27,500</strong>.`
+      },
+      {
+        num: 10, section: 'A', type: 'mcq', topic: 'IAS 36 Impairment', marks: 2,
+        stem: `<p class="mb-3">At 30 September 20X5 Arnold Co owned a brand with a carrying amount of $40m. An impairment review was conducted and the value in use of the brand was calculated as $35.2m. The fair value was deemed to be $38m and estimated selling costs were $0.2m.</p><p class="font-semibold text-slate-900">Following the recognition of the impairment loss, what is the carrying amount of the brand at 30 September 20X5?</p>`,
+        options: [
+          { key: 'A', text: '$40.0m' },
+          { key: 'B', text: '$35.2m' },
+          { key: 'C', text: '$37.8m' },
+          { key: 'D', text: '$38.0m' }
+        ],
+        correct: 'C',
+        explanation: `• Fair value less costs of disposal = $38.0m − $0.2m = $37.8m.<br>• Value in use = $35.2m.<br>• Recoverable amount (higher of the two) = <strong>$37.8m</strong>. Asset is written down from $40.0m to $37.8m.`
+      },
+      {
+        num: 11, section: 'A', type: 'dropdown_table', topic: 'IAS 23 & IAS 16', marks: 2,
+        stem: `<p class="mb-3">Roti Co obtained a $3m 6% loan on 1 January 20X1 in order to construct new retail premises. Construction began on 1 April 20X1 and cost a total of $5m. Construction was completed and the premises were ready for use on 1 January 20X2.</p>
+          <p class="mb-3">Roti Co hosted a launch event to officially open the premises to retail customers on 1 March 20X2.</p>
+          <p class="font-semibold text-slate-900">Select the amount that must be capitalised in respect of borrowing costs for the year ended 31 December 20X1 and the date that depreciation will begin.</p>`,
+        headers: ['Requirement', 'Answer'],
+        rows: [
+          { id: 'bc', label: 'Borrowing costs to be capitalised', options: ['$135,000', '$180,000', '$225,000', '$300,000'], correct: '$135,000' },
+          { id: 'dt', label: 'Date that depreciation will begin', options: ['1 January 20X2', '1 March 20X2'], correct: '1 January 20X2' }
+        ],
+        explanation: `• Under <strong>IAS 23</strong>, capitalisation starts when construction begins (1 April 20X1) and ends when ready for use (1 Jan 20X2) = 9 months: $3,000,000 × 6% × 9/12 = <strong>$135,000</strong>.<br>• Under <strong>IAS 16.55</strong>, depreciation begins when the asset is available for use: <strong>1 January 20X2</strong>.`
+      },
+      {
+        num: 12, section: 'A', type: 'multi', selectCount: 2, topic: 'IAS 16 PPE', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-1">In relation to the revaluation of non-current assets, which TWO of the following are correct in accordance with IAS 16 <em>Property, Plant and Equipment</em>?</p><p class="text-sm italic text-slate-600">(Select TWO answers.)</p>`,
+        options: [
+          { key: 'A', text: 'Transfers from revaluation surplus to retained earnings are made through profit or loss.' },
+          { key: 'B', text: 'A revaluation surplus arises when a non-current asset is sold at a profit.' },
+          { key: 'C', text: 'The revaluation surplus is part of equity in the statement of financial position.' },
+          { key: 'D', text: 'The frequency of revaluation depends on any volatility in the fair value of asset.' }
+        ],
+        correct: ['C', 'D'],
+        explanation: `<strong>C</strong> and <strong>D</strong> are correct under IAS 16 (revaluation surplus is part of equity, and revaluation frequency depends on fair value volatility).`
+      },
+      {
+        num: 13, section: 'A', type: 'multi', selectCount: 2, topic: 'IAS 16 Disposal', marks: 2,
+        stem: `<p class="mb-3">Dewey Co acquired a warehouse on 1 January 20X1 for $5m. At this date the warehouse had a useful life of 40 years. On 1 January 20X7 it revalued the warehouse to its fair value of $8.5m. Its remaining useful life was unchanged. On 31 December 20X8 it was sold for $8.1m.</p><p class="font-semibold text-slate-900 mb-1">Which TWO amounts should be recorded in the statement of profit or loss for the year ended 31 December 20X8?</p><p class="text-sm italic text-slate-600">(Select TWO answers.)</p>`,
+        options: [
+          { key: 'A', text: 'Depreciation expense of $250,000' },
+          { key: 'B', text: 'Depreciation expense of $212,500' },
+          { key: 'C', text: 'Loss on disposal of $400,000' },
+          { key: 'D', text: 'Gain on disposal of $100,000' },
+          { key: 'E', text: 'Gain on disposal of $25,000' }
+        ],
+        correct: ['A', 'D'],
+        explanation: `• At 1 Jan 20X7, 6 years had elapsed → remaining useful life = 40 − 6 = 34 years.<br>• Annual depreciation = $8,500,000 ÷ 34 = <strong>$250,000 (A)</strong>.<br>• Carrying amount at 31 Dec 20X8 (after 2 yrs dep: 20X7 &amp; 20X8) = $8,500,000 − $500,000 = $8,000,000.<br>• Gain on disposal = $8,100,000 − $8,000,000 = <strong>$100,000 (D)</strong>.`
+      },
+      {
+        num: 14, section: 'A', type: 'mcq', topic: 'IFRS 10 Consolidation', marks: 2,
+        stem: `<p class="mb-3">On 1 October 20X8, Picture Co acquired 60% of the shares in Frame Co. At 1 April 20X8, the credit balances on the revaluation surpluses relating to Picture Co and Frame Co's equity financial asset investments stood at $6,400 and $4,400 respectively.</p>
+          <p class="mb-2">The following extract was taken from the financial statements for the year ended 31 March 20X9:</p>
+          <table class="cbe-table max-w-md">
+            <thead><tr><th></th><th class="num">Picture Co ($)</th><th class="num">Frame Co ($)</th></tr></thead>
+            <tbody>
+              <tr><td>OCI: loss on FV of equity FA</td><td class="num">(1,400)</td><td class="num">(800)</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 font-semibold text-slate-900">Assume the losses accrued evenly throughout the year. What is the amount of the revaluation surplus in the consolidated statement of financial position of Picture Co as at 31 March 20X9?</p>`,
+        options: [
+          { key: 'A', text: '$4,520' },
+          { key: 'B', text: '$4,760' },
+          { key: 'C', text: '$5,240' },
+          { key: 'D', text: '$9,160' }
+        ],
+        correct: 'B',
+        explanation: `• Picture Co closing reserve = $6,400 − $1,400 = $5,000.<br>• Post-acquisition period = 1 Oct 20X8 to 31 Mar 20X9 (6 months).<br>• Frame Co post-acquisition OCI loss = ($800) × 6/12 = ($400).<br>• Group share (60%) = 60% × ($400) = ($240).<br>• Consolidated revaluation surplus = $5,000 − $240 = <strong>$4,760</strong>.`
+      },
+      {
+        num: 15, section: 'A', type: 'mcq', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="mb-3">Cornet Co entered into an eight year lease agreement on 1 July 20X4. The lease requires annual payments of $750,000 in arrears. The present value of the lease payments at 1 July 20X4, discounted at a rate of 6%, is $4,657,500. Additionally, Cornet Co paid directly attributable costs of $37,500 on 1 July 20X4.</p><p class="font-semibold text-slate-900">What is the total charge to the statement of profit or loss for the year ended 30 June 20X5 in respect of the right-of-use asset?</p>`,
+        options: [
+          { key: 'A', text: '$586,875' },
+          { key: 'B', text: '$866,325' },
+          { key: 'C', text: '$279,450' },
+          { key: 'D', text: '$1,029,450' }
+        ],
+        correct: 'B',
+        explanation: `• Initial ROU asset = $4,657,500 + $37,500 = $4,695,000.<br>• Depreciation = $4,695,000 ÷ 8 years = $586,875.<br>• Finance cost = $4,657,500 × 6% = $279,450.<br>• Total P&amp;L charge = $586,875 + $279,450 = <strong>$866,325</strong>.`
+      },
+      {
+        num: 16, section: 'A', type: 'mcq', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="mb-3">Flute Co undertakes drilling activities and has a widely publicised environmental policy stating that it will incur costs to restore land to its original condition once drilling activities have been completed.</p>
+          <p class="mb-3">Drilling commenced on a particular piece of land on 1 July 20X8. At this time, Flute Co estimated that it would cost $3m to restore the land when drilling was completed in five years' time. Flute Co's cost of capital is 7% and the appropriate present value factor is 0.713.</p>
+          <p class="font-semibold text-slate-900">At what amount will the provision for restoration costs be measured in Flute Co's statement of financial position as at 31 December 20X8?</p>`,
+        options: [
+          { key: 'A', text: '$2.14m' },
+          { key: 'B', text: '$3m' },
+          { key: 'C', text: '$2.29m' },
+          { key: 'D', text: '$2.21m' }
+        ],
+        correct: 'D',
+        explanation: `• Provision on 1 Jul 20X8 = $3m × 0.713 = $2.139m.<br>• Unwinding of discount for <strong>6 months</strong> (1 Jul – 31 Dec 20X8): $2.139m × 7% × 6/12 = $0.0749m.<br>• Closing provision = $2.139m + $0.0749m = $2.2139m ≈ <strong>$2.21m</strong>.`
+      },
+      {
+        num: 17, section: 'A', type: 'mcq', topic: 'IAS 36 Impairment', marks: 2,
+        stem: `<p class="mb-3">A machine was purchased three years ago, and has a current carrying amount of $75,000. At 31 December 20X6, due to a change in government environmental legislation, the economic benefits generated from the machine have fallen. It is estimated that the machine would have a current resale value of $70,000, with associated disposal costs of $3,000. If the machine is continued to be used, it would generate cash flows for the next two years of $40,000, and would then be scrapped on 31 December 20X8. The company has a cost of capital of 8%, giving the following discount rates:</p>
+          <table class="cbe-table max-w-xs">
+            <thead><tr><th>Year</th><th class="num">Discount rate</th></tr></thead>
+            <tbody>
+              <tr><td>Year 1</td><td class="num">0.93</td></tr>
+              <tr><td>Year 2</td><td class="num">0.86</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 font-semibold text-slate-900">What is the recoverable amount of the machine at 31 December 20X6?</p>`,
+        options: [
+          { key: 'A', text: '$67,000' },
+          { key: 'B', text: '$70,000' },
+          { key: 'C', text: '$71,600' },
+          { key: 'D', text: '$75,000' }
+        ],
+        correct: 'C',
+        explanation: `• Fair value less costs of disposal = $70,000 − $3,000 = $67,000.<br>• Value in use = ($40,000 × 0.93) + ($40,000 × 0.86) = $37,200 + $34,400 = $71,600.<br>• Recoverable amount (higher of the two) = <strong>$71,600</strong>.`
+      },
+      {
+        num: 18, section: 'A', type: 'mcq', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="mb-2">Colco has the following issues in its financial statements for the year ended 31 December 20X6:</p>
+          <ol class="list-none pl-2 space-y-2 mb-3">
+            <li>(i) Colco have decided to shut the Bolco division, resulting in the loss of 50 jobs. This was agreed by the board in December 20X6, and recorded in the minutes of the board meeting. The affected staff will be notified of redundancy in January 20X7.</li>
+            <li>(ii) A customer is suing Colco due to a faulty part supplied in October 20X6, which caused injury to a consumer. The legal team think Colco will successfully defend this claim, but that there is a 20–30% chance that Colco will lose.</li>
+            <li>(iii) Colco operates a mine in Geogo, a country which has no enacted environmental legislation. Restoration of the site when the mine closes in five years will cost $50 million. Colco publicises its ethical credentials in its literature, with the phrase 'no damage is ever left'.</li>
+          </ol>
+          <p class="font-semibold text-slate-900">For which of the above scenarios should Colco recognise a provision as at 31 December 20X6?</p>`,
+        options: [
+          { key: 'A', text: 'i only' },
+          { key: 'B', text: 'ii and iii' },
+          { key: 'C', text: 'i, ii and iii' },
+          { key: 'D', text: 'iii only' }
+        ],
+        correct: 'D',
+        explanation: `• (i) No provision — staff are not notified until Jan 20X7 (no valid expectation raised before year-end; IAS 37.72).<br>• (ii) No provision — 20–30% is not probable (&le;50%); disclose as contingent liability.<br>• (iii) <strong>Provision required</strong> — published policy creates a constructive obligation.`
+      },
+      // SECTION B — SCENARIO 1: ANNIE (Q19-Q23)
+      {
+        num: 19, section: 'B', scenarioId: 'annie', type: 'multi', selectCount: 2, topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-1">For which TWO of the following leased items could an entity claim exemption from recognition under the terms of IFRS 16 <em>Leases</em>?</p><p class="text-sm italic text-slate-600">(Select TWO answers.)</p>`,
+        options: [
+          { key: 'A', text: 'The lease term is for 12 months.' },
+          { key: 'B', text: 'The lease term is for 24 months.' },
+          { key: 'C', text: 'The asset is new and of low value.' },
+          { key: 'D', text: 'The asset is new and not of low value.' }
+        ],
+        correct: ['A', 'C'],
+        explanation: `Under <strong>IFRS 16.5</strong>, lessees may elect recognition exemptions for short-term leases (&le;12 months: <strong>A</strong>) and leases of low-value assets when new (<strong>C</strong>).`
+      },
+      {
+        num: 20, section: 'B', scenarioId: 'annie', type: 'number', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">What is the non-current liability to be shown in Annie's statement of financial position as at 30 June 20X7 in relation to the lease of the plant?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['205100'],
+        displayCorrect: '$205,100',
+        explanation: `• Year 1 (to 30 Jun 20X7): $560,000 + 10% ($56,000) − $225,000 = $391,000 (total liability at 30 Jun 20X7).<br>• Year 2 (to 30 Jun 20X8): $391,000 + 10% ($39,100) − $225,000 = <strong>$205,100</strong> (non-current liability at 30 Jun 20X7).`
+      },
+      {
+        num: 21, section: 'B', scenarioId: 'annie', type: 'mcq', topic: 'IFRS 16 Sale & Leaseback', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">How would the disposal of an asset sold under a sale and leaseback agreement be treated, where the sale does not satisfy the criteria for recognition under IFRS 15 <em>Revenue from Contracts with Customers</em>?</p>`,
+        options: [
+          { key: 'A', text: 'Profit on disposal recognised immediately in statement of profit or loss.' },
+          { key: 'B', text: 'Profit on disposal deferred over remaining life of the asset.' },
+          { key: 'C', text: 'Disposal ignored, asset continues to be measured on existing basis.' },
+          { key: 'D', text: 'Disposal ignored, asset revalued to present value of lease payments.' }
+        ],
+        correct: 'C',
+        explanation: `Under <strong>IFRS 16.103(a)</strong>, if the transfer is not a sale under IFRS 15, the seller-lessee continues to recognise the transferred asset on its existing basis and recognises a financial liability equal to the transfer proceeds under IFRS 9.`
+      },
+      {
+        num: 22, section: 'B', scenarioId: 'annie', type: 'number', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">What expense should be shown for depreciation of the leased plant in the statement of profit or loss for the year to 30 June 20X7?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['140000'],
+        displayCorrect: '$140,000',
+        explanation: `Because <strong>ownership passes to Annie</strong> at the end of the lease, the ROU asset is depreciated over its <em>useful life</em> of 4 years (IFRS 16.32): $560,000 ÷ 4 = <strong>$140,000</strong>.`
+      },
+      {
+        num: 23, section: 'B', scenarioId: 'annie', type: 'mcq', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Annie wishes to lease a building. Which of the following would not be recognised as part of the initial value of the right-of-use asset?</p>`,
+        options: [
+          { key: 'A', text: 'The present value of the lease payments.' },
+          { key: 'B', text: 'Options to purchase if these are reasonably certain not to be exercised.' },
+          { key: 'C', text: 'Professional fees paid to acquire the building.' },
+          { key: 'D', text: 'Estimated costs of refurbishment at the end of the lease in accordance with the lease terms.' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IFRS 16.24 &amp; 27</strong>, a purchase option is only included in the lease liability (and ROU asset) if the lessee is <em>reasonably certain</em> to exercise it — NOT when it is reasonably certain not to be exercised.`
+      },
+      // SECTION B — SCENARIO 2: PUP (Q24-Q28)
+      {
+        num: 24, section: 'B', scenarioId: 'pup', type: 'mcq', topic: 'IAS 40 Investment Property', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Which of the following is the correct definition of investment property according to IAS 40 <em>Investment Property</em>?</p>`,
+        options: [
+          { key: 'A', text: 'Property held for capital growth, rental income or both.' },
+          { key: 'B', text: "Property not used for the entity's main business activity." },
+          { key: 'C', text: 'Land acquired for development.' },
+          { key: 'D', text: 'Property anticipated to increase in value.' }
+        ],
+        correct: 'A',
+        explanation: `<strong>IAS 40.5</strong> defines investment property as land or a building held to earn rentals or for capital appreciation or both.`
+      },
+      {
+        num: 25, section: 'B', scenarioId: 'pup', type: 'mcq', topic: 'IAS 40 Investment Property', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Assuming Pup elect to use the fair value model for investment property, what is the correct accounting treatment of the gain on the property held by Pup at 31 December 20X8?</p>`,
+        options: [
+          { key: 'A', text: 'A gain of $300,000 shown in the statement of profit or loss.' },
+          { key: 'B', text: 'A gain of $508,000 shown in the statement of profit or loss.' },
+          { key: 'C', text: 'A gain of $300,000 shown in other comprehensive income.' },
+          { key: 'D', text: 'A gain of $508,000 shown in other comprehensive income.' }
+        ],
+        correct: 'A',
+        explanation: `Under the <strong>IAS 40 fair value model</strong>, investment property is not depreciated and fair value gains ($5.5m − $5.2m = <strong>$300,000</strong>) are recognised directly in <strong>profit or loss</strong>.`
+      },
+      {
+        num: 26, section: 'B', scenarioId: 'pup', type: 'number', topic: 'IAS 20 & IAS 16', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Assuming Pup elect to treat the grant income as a deferred credit, what is the carrying amount of the plant as at 31 December 20X8?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['288000'],
+        displayCorrect: '$288,000',
+        explanation: `Under the deferred credit method, the plant is recorded at full cost ($320,000). Less 1 year's depreciation at 10% ($32,000) = <strong>$288,000</strong>.`
+      },
+      {
+        num: 27, section: 'B', scenarioId: 'pup', type: 'mcq', topic: 'IAS 20 Grants', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">What is the value of grant income to be recognised in the statement of profit or loss for the year ended 31 December 20X8?</p>`,
+        options: [
+          { key: 'A', text: '$27,000' },
+          { key: 'B', text: '$30,000' },
+          { key: 'C', text: '$3,000' },
+          { key: 'D', text: '$6,000' }
+        ],
+        correct: 'C',
+        explanation: `The $30,000 grant is released to P&amp;L over the plant's 10-year useful life (10% straight-line): $30,000 × 10% = <strong>$3,000</strong>.`
+      },
+      {
+        num: 28, section: 'B', scenarioId: 'pup', type: 'number', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-1">What is the value of the dismantling provision when the mine opens?</p><p class="text-sm italic text-slate-600">Answer in $ million to 1 decimal place.</p>`,
+        prefix: '$', suffix: 'million',
+        accepted: ['9.9', '9.90'],
+        displayCorrect: '$9.9 million',
+        explanation: `Present value of dismantling cost = $45 million × $0.22 = <strong>$9.9 million</strong>.`
+      },
+      // SECTION B — SCENARIO 3: REEF (Q29-Q30)
+      {
+        num: 29, section: 'B', scenarioId: 'reef', type: 'mcq', topic: 'IAS 38 / IAS 7', marks: 2,
+        stem: `<p class="mb-2">Reef purchased $3.1 million of intangible assets during the year. None of the intangible assets were impaired during the year.</p><p class="font-semibold text-slate-900">What was the value of amortisation charged against intangible assets during the year?</p>`,
+        options: [
+          { key: 'A', text: '$4.6 million' },
+          { key: 'B', text: '$1.5 million' },
+          { key: 'C', text: '$1.6 million' },
+          { key: 'D', text: '$3.1 million' }
+        ],
+        correct: 'C',
+        explanation: `Intangible assets T-account ($'000): Opening $11,500 + Additions $3,100 − Closing $13,000 = Amortisation of $1,600k = <strong>$1.6 million</strong>.`
+      },
+      {
+        num: 30, section: 'B', scenarioId: 'reef', type: 'number', topic: 'IAS 7 Cash Flows', marks: 2,
+        stem: `<p class="mb-2">During the year Reef disposed of an item of plant for cash proceeds of $8.5 million.</p><p class="font-semibold text-slate-900">What is the amount of cash paid by Reef for property, plant and equipment during the year ended 30 June 20X3?</p>`,
+        prefix: '$', suffix: '(e.g. 8000000 or 8m)',
+        accepted: ['8000000', '8000', '8', '8m', '8.0', '8.0m', '8million'],
+        displayCorrect: '$8,000,000 ($8m)',
+        explanation: `• Carrying amount of disposed plant = Proceeds $8.5m + Loss on disposal $1.5m = $10.0m ($10,000k).<br>• PPE T-account ($'000): Opening $32,000 − Depreciation $3,000 − Disposal CV $10,000 + Additions = Closing $27,000.<br>• Cash additions = $27,000 − $19,000 = $8,000k = <strong>$8,000,000 ($8m)</strong>.`
+      }
+    ]
+  },
+  // ==========================================================================
+  // EXAM 3: FR WEEKLY MOCK 1 (ACCA-EKM-December-2026-FR WM 1)
+  // ==========================================================================
+  {
+    id: 'exam3',
+    code: 'FR-WM1-DEC26',
+    title: 'Financial Reporting (FR) — Weekly Mock 1',
+    subtitle: 'ACCA-EKM-December-2026-FR WM 1 • 18 Questions • 36 Marks',
+    totalQuestions: 18,
+    totalMarks: 36,
+    marksPerQuestion: 2,
+    accaMinutes: 65, // ACCA Standard: 36 marks × 1.8 min/mark = 64.8 → 65 mins
+    paperMinutes: 45, // Timed sprint option
+    sections: [
+      { id: 'A', name: 'Section A — Objective Test Questions', range: [1, 18], description: '18 individual questions (2 marks each = 36 marks)' }
+    ],
+    scenarios: {},
+    questions: [
+      {
+        num: 1, section: 'A', type: 'mcq', topic: 'IFRS 15 Revenue', marks: 2,
+        stem: `<p class="mb-3">Repro, a company which sells photocopying equipment, has prepared its draft financial statements for the year ended 30 September 20X4. It has included the following transactions in revenue at the stated amounts below.</p><p class="font-semibold text-slate-900">Which of these has been correctly included in revenue according to IFRS 15 <em>Revenue from Contracts with Customers</em>?</p>`,
+        options: [
+          { key: 'A', text: 'Agency sales of $250,000 on which Repro is entitled to a commission' },
+          { key: 'B', text: 'Sale proceeds of $20,000 for motor vehicles which were no longer required by Repro' },
+          { key: 'C', text: 'Sales of $150,000 on 30 September 20X4. The amount invoiced to and received from the customer was $180,000, which included $30,000 for ongoing servicing work to be done by Repro over the next two years.' },
+          { key: 'D', text: 'Sales of $200,000 on 1 October 20X3 to an established customer which, (with the agreement of Repro), will be paid in full on 30 September 20X5. Repro has a cost of capital of 10%.' }
+        ],
+        correct: 'C',
+        explanation: `The amount to recognise in revenue is <strong>$150,000</strong> as the servicing amount of $30,000 has not yet been earned and must be deferred as a contract liability. Agency sales (A) only include commission; motor vehicle disposal (B) is not ordinary-course revenue; deferred payment over 2 years (D) must be discounted for the significant financing component.`
+      },
+      {
+        num: 2, section: 'A', type: 'mcq', topic: 'IAS 20 Grants', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">Which of the following are acceptable methods of accounting for a government grant relating to an asset in accordance with IAS 20 <em>Accounting for Government Grants and Disclosure of Government Assistance</em>?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>(i) &nbsp; Set up the grant as deferred income</li>
+            <li>(ii) &nbsp; Credit the amount received to profit or loss</li>
+            <li>(iii) &nbsp; Deduct the grant from the carrying amount of the asset</li>
+            <li>(iv) &nbsp; Add the grant to the carrying amount of the asset</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '(i) and (ii)' },
+          { key: 'B', text: '(ii) and (iv)' },
+          { key: 'C', text: '(i) and (iii)' },
+          { key: 'D', text: '(iii) and (iv)' }
+        ],
+        correct: 'C',
+        explanation: `Under <strong>IAS 20.24</strong>, an asset-related grant may be presented either as deferred income (i) or deducted in arriving at the carrying amount of the asset (iii). It cannot be credited immediately to profit or loss.`
+      },
+      {
+        num: 3, section: 'A', type: 'mcq', topic: 'IAS 38 Intangibles', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Which one of the following internally-generated items may be eligible for capitalisation as intangible assets in accordance with IAS 38 <em>Intangible Assets</em>? (Ignore business combinations.)</p>`,
+        options: [
+          { key: 'A', text: 'A customer list' },
+          { key: 'B', text: 'A pre-production prototype' },
+          { key: 'C', text: 'Goodwill' },
+          { key: 'D', text: 'The cost of researching new material' }
+        ],
+        correct: 'B',
+        explanation: `A <strong>pre-production prototype</strong> is a development cost eligible for capitalisation if the IAS 38.57 PIRATE criteria are met. Internally-generated customer lists (IAS 38.63), internally-generated goodwill (IAS 38.48), and research costs (IAS 38.54) cannot be capitalised.`
+      },
+      {
+        num: 4, section: 'A', type: 'mcq', topic: 'IAS 23 Borrowing Costs', marks: 2,
+        stem: `<p class="mb-2">A company has the following loans in place throughout the year ended 31 December 20X8.</p>
+          <table class="cbe-table max-w-xs">
+            <thead><tr><th>Loan</th><th class="num">$m</th></tr></thead>
+            <tbody>
+              <tr><td>10% bank loan</td><td class="num">140</td></tr>
+              <tr><td>8% bank loan</td><td class="num">200</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 mb-2">On 1 July 20X8 $50 million was drawn down for construction of a qualifying asset which was completed during 20X9.</p>
+          <p class="font-semibold text-slate-900">What amount should be capitalised as borrowing costs at 31 December 20X8 in respect of this asset?</p>`,
+        options: [
+          { key: 'A', text: '$5.6 million' },
+          { key: 'B', text: '$2.8 million' },
+          { key: 'C', text: '$4.4 million' },
+          { key: 'D', text: '$2.2 million' }
+        ],
+        correct: 'D',
+        explanation: `• Weighted average capitalisation rate = (10% × 140/340) + (8% × 200/340) = 4.12% + 4.71% = 8.82% (≈ 8.8%).<br>• Capitalised borrowing costs (6 months: 1 Jul – 31 Dec 20X8) = $50m × 8.8% × 6/12 = <strong>$2.2 million</strong>.`
+      },
+      {
+        num: 5, section: 'A', type: 'mcq', topic: 'IAS 16 PPE', marks: 2,
+        stem: `<p class="mb-3">Princeton purchased a lorry on 1 October 20X5 for $200,000. It is being depreciated on a monthly basis over five years assuming a residual value of $10,000. On 1 January 20X6, in accordance with environmental legislation, the lorry had to be fitted with an emissions analyser at a cost of $8,000. This has a useful life of ten years.</p><p class="font-semibold text-slate-900">What is the carrying amount of the lorry at 30 June 20X6?</p>`,
+        options: [
+          { key: 'A', text: '$179,100' },
+          { key: 'B', text: '$180,700' },
+          { key: 'C', text: '$179,600' },
+          { key: 'D', text: '$179,200' }
+        ],
+        correct: 'A',
+        explanation: `• Lorry cost = $200,000; Depreciation (9 months, 1 Oct 20X5 – 30 Jun 20X6) = (($200,000 − $10,000) ÷ 5) × 9/12 = ($28,500).<br>• Emissions analyser (capitalised as mandatory safety/environmental equipment under IAS 16.11) = $8,000; Depreciation (6 months, 1 Jan – 30 Jun 20X6) = ($8,000 ÷ 10) × 6/12 = ($400).<br>• Carrying amount = $200,000 − $28,500 + $8,000 − $400 = <strong>$179,100</strong>.`
+      },
+      {
+        num: 6, section: 'A', type: 'mcq', topic: 'IAS 36 Impairment', marks: 2,
+        stem: `<p class="mb-3">A machine has a carrying amount of $5m. The present value of cash inflows expected from continuing to use the machine for the rest of its useful life is estimated at $4.7m. A company in China is interested in buying the machine and has made an offer of $4.8m. The cost of shipping the machine to China is estimated at $60,000.</p><p class="font-semibold text-slate-900">What amount should be recognised as the impairment loss in respect of the machine?</p>`,
+        options: [
+          { key: 'A', text: '$300,000' },
+          { key: 'B', text: '$200,000' },
+          { key: 'C', text: '$260,000' },
+          { key: 'D', text: '$360,000' }
+        ],
+        correct: 'C',
+        explanation: `• Value in use = $4.70m.<br>• Fair value less costs of disposal = $4.80m − $0.06m = $4.74m.<br>• Recoverable amount (higher of the two) = $4.74m.<br>• Impairment loss = $5.00m − $4.74m = <strong>$260,000</strong>.`
+      },
+      {
+        num: 7, section: 'A', type: 'mcq', topic: 'IFRS 15 Revenue', marks: 2,
+        stem: `<p class="mb-3">IFRS 15 <em>Revenue from Contracts with Customers</em> identifies five steps in the core principle of recognising revenue.</p><p class="font-semibold text-slate-900">Which of the following is NOT a step in the recognition process?</p>`,
+        options: [
+          { key: 'A', text: 'Identify the performance obligations in a contract' },
+          { key: 'B', text: 'Allocate the transaction price to the performance obligations in the contract' },
+          { key: 'C', text: 'Identify the contract with a customer' },
+          { key: 'D', text: 'Assess whether significant risks and rewards of ownership have been transferred to the buyer' }
+        ],
+        correct: 'D',
+        explanation: `Options A, B, and C are steps in the <strong>IFRS 15</strong> five-step model (along with determining the transaction price and recognising revenue when/as control transfers). Assessing significant risks and rewards (<strong>D</strong>) was the old IAS 18 model, not one of the five steps of IFRS 15.`
+      },
+      {
+        num: 8, section: 'A', type: 'mcq', topic: 'IFRS 16 Leases', marks: 2,
+        stem: `<p class="font-semibold text-slate-900">Which of the following determines that an arrangement constitutes a lease?</p>`,
+        options: [
+          { key: 'A', text: 'The supplier can at their discretion substitute an identical asset' },
+          { key: 'B', text: 'The main terms and conditions of the contract are in writing' },
+          { key: 'C', text: 'The customer has the right to obtain substantially all economic benefits from use of the asset and direct its use' },
+          { key: 'D', text: 'Ownership is not transferred at the end of the contractual term' }
+        ],
+        correct: 'C',
+        explanation: `Under <strong>IFRS 16.9 &amp; B9</strong>, a contract contains a lease if it conveys the right to control the use of an identified asset for a period of time — meaning the customer has the right to obtain substantially all economic benefits and direct its use (<strong>C</strong>). A substantive right of substitution by the supplier (A) means there is no identified asset.`
+      },
+      {
+        num: 9, section: 'A', type: 'mcq', topic: 'IFRS 16 Sale & Leaseback', marks: 2,
+        stem: `<p class="mb-3">Swinfen has sold one of its office buildings to a merchant bank and leased it back for 10 years. The sale price was $16m, which is equivalent to the fair value of the building. The carrying amount of the building at the date of transfer was $12m and the present value of the lease liability is $6m.</p><p class="font-semibold text-slate-900">What amount of gain can be recognised in the statement of profit or loss in the year of disposal?</p>`,
+        options: [
+          { key: 'A', text: '$4.0m' },
+          { key: 'B', text: '$2.5m' },
+          { key: 'C', text: '$2.0m' },
+          { key: 'D', text: '$1.5m' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IFRS 16.100</strong>, only the gain relating to the rights <em>transferred</em> to the buyer-lessor is recognised:<br>• Total gain = $16m − $12m = $4.0m.<br>• Rights transferred proportion = ($16m − $6m) / $16m = 10/16.<br>• Recognised gain = $4.0m × 10/16 = <strong>$2.5m</strong>.`
+      },
+      {
+        num: 10, section: 'A', type: 'mcq', topic: 'IAS 32 Financial Instruments', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">Which of the following is a financial asset in accordance with IAS 32 <em>Financial Instruments: Presentation</em>?</p>
+          <table class="cbe-table">
+            <tbody>
+              <tr><td class="w-12 font-semibold">(1)</td><td>A holding of equity instruments in another entity</td></tr>
+              <tr><td class="w-12 font-semibold">(2)</td><td>A contract to exchange financial instruments with another entity under conditions which are potentially favourable</td></tr>
+              <tr><td class="w-12 font-semibold">(3)</td><td>A contract to exchange financial instruments with another entity under conditions which are potentially unfavourable</td></tr>
+              <tr><td class="w-12 font-semibold">(4)</td><td>Cash</td></tr>
+            </tbody>
+          </table>`,
+        options: [
+          { key: 'A', text: '1 and 2 only' },
+          { key: 'B', text: '1, 2 and 4' },
+          { key: 'C', text: '1, 3 and 4' },
+          { key: 'D', text: '4 only' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IAS 32.11</strong>, a financial asset includes cash (4), an equity instrument of another entity (1), and a contractual right to exchange financial instruments under potentially <em>favourable</em> conditions (2). Potentially unfavourable conditions (3) represent a financial liability.`
+      },
+      {
+        num: 11, section: 'A', type: 'mcq', topic: 'IAS 32 Compound Instruments', marks: 2,
+        stem: `<p class="mb-3">Misolo issued 3,000 convertible $100 bonds at par on 1 January 20X6 redeemable in three years. Interest is payable annually in arrears at 6% and the market rate of interest rate at the date of issue was 8%.</p>
+          <p class="mb-2">The present value of $1 receivable at the end of each year, based on discount rates of 6% and 8%, are:</p>
+          <table class="cbe-table max-w-xs">
+            <thead><tr><th>End of year</th><th class="num">6% ($)</th><th class="num">8% ($)</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td class="num">0.943</td><td class="num">0.926</td></tr>
+              <tr><td>2</td><td class="num">0.890</td><td class="num">0.857</td></tr>
+              <tr><td>3</td><td class="num">0.840</td><td class="num">0.794</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 font-semibold text-slate-900">At what amount should the equity component of the bonds be recognised (to the nearest $00)?</p>`,
+        options: [
+          { key: 'A', text: '$11,700' },
+          { key: 'B', text: '$13,700' },
+          { key: 'C', text: '$15,400' },
+          { key: 'D', text: '$18,900' }
+        ],
+        correct: 'C',
+        explanation: `Issue proceeds = 3,000 × $100 = $300,000; Annual coupon = $300,000 × 6% = $18,000. Discount cash flows at market rate (8%):<br>• Year 1 interest: $18,000 × 0.926 = $16,668<br>• Year 2 interest: $18,000 × 0.857 = $15,426<br>• Year 3 interest: $18,000 × 0.794 = $14,292<br>• Year 3 principal: $300,000 × 0.794 = $238,200<br>• PV of liability = $284,586 → Equity component = $300,000 − $284,586 = $15,414 ≈ <strong>$15,400</strong>.`
+      },
+      {
+        num: 12, section: 'A', type: 'mcq', topic: 'IAS 40 Investment Property', marks: 2,
+        stem: `<p class="mb-3">A company ceased owner-occupation of an office building on 1 January 20X3 and let the building out to a third party. The fair value of the building at that date was estimated to be $900,000. The building had originally cost $800,000 on 1 January 20X1 and has a 50-year life. At 31 December 20X3, the building had an estimated fair value of $1,100,000 and the directors decided to adopt the fair value model of IAS 40 <em>Investment Property</em>.</p><p class="font-semibold text-slate-900">What amount should be credited to profit or loss in respect of the building at 31 December 20X3?</p>`,
+        options: [
+          { key: 'A', text: '$200,000' },
+          { key: 'B', text: '$300,000' },
+          { key: 'C', text: '$313,250' },
+          { key: 'D', text: '$332,000' }
+        ],
+        correct: 'A',
+        explanation: `Under <strong>IAS 40.61</strong>, the uplift up to the transfer date ($900,000 − [$800,000 − 2/50 × $800,000] = $132,000) is recognised in <em>OCI</em> as an IAS 16 revaluation. Only the subsequent fair value increase after becoming investment property ($1,100,000 − $900,000 = <strong>$200,000</strong>) is credited to profit or loss.`
+      },
+      {
+        num: 13, section: 'A', type: 'mcq', topic: 'IAS 21 Foreign Exchange', marks: 2,
+        stem: `<p class="mb-3">Tabasco's functional currency is the euro but its presentation currency is the dollar. It has a head office property bought three years ago and carried at historical cost.</p><p class="font-semibold text-slate-900">At what exchange rate should the property be measured at the reporting date?</p>`,
+        options: [
+          { key: 'A', text: 'The rate on the date of purchase' },
+          { key: 'B', text: 'The rate at the reporting date' },
+          { key: 'C', text: 'The rate at the beginning of the reporting period' },
+          { key: 'D', text: 'The average rate for the year' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IAS 21.39(a)</strong>, when translating financial statements from a <em>functional currency</em> (euro) into a different <em>presentation currency</em> (dollar), <strong>all assets and liabilities</strong> (both monetary and non-monetary) are translated at the <strong>closing rate at the reporting date (B)</strong>.<br><span class="text-amber-800 font-medium">Accuracy Note:</span> The ClassMarker sheet mistakenly marked A by applying IAS 21.23(b) (foreign currency <em>transactions</em>), whereas this question explicitly asks about translating into a <em>presentation currency</em>.`
+      },
+      {
+        num: 14, section: 'A', type: 'mcq', topic: 'IAS 37 Provisions', marks: 2,
+        stem: `<p class="mb-3">TY is the main contractor employing sub-contractors to assist it when required.</p>
+          <p class="mb-3">TY has recently completed a contract replacing a roof on the local school. Despite this, the roof has been leaking and some sections are now unsafe. The school is suing TY for $20,000 to repair the roof.</p>
+          <p class="mb-3">TY used a sub-contractor to install the roof and regards the sub-contractor's work as faulty. TY has raised a court action against the sub-contractor claiming the cost of the school's action plus legal fees, a total of $22,000.</p>
+          <p class="mb-3">TY has been informed by legal advisers that it will probably lose the case brought against it by the school and will probably win the case against the sub-contractor.</p>
+          <p class="font-semibold text-slate-900">How should these events be accounted for in TY's financial statements?</p>`,
+        options: [
+          { key: 'A', text: 'Provide for the $20,000 liability and disregard the case against the sub-contractor' },
+          { key: 'B', text: 'Provide for the $20,000 liability and disclose the probable receipt of cash from the case against the sub-contractor in a note' },
+          { key: 'C', text: 'Make no provision but disclose the $20,000 liability in a note' },
+          { key: 'D', text: 'Provide for the $20,000 liability and recognise the probable receipt of cash from the case against the sub-contractor in a current asset' }
+        ],
+        correct: 'B',
+        explanation: `Under <strong>IAS 37</strong>, the probable $20,000 outflow meets the recognition criteria for a <strong>provision</strong>. The probable recovery from the sub-contractor is a <strong>contingent asset</strong> (not virtually certain), so it must be <strong>disclosed in a note</strong> and not recognised.`
+      },
+      {
+        num: 15, section: 'A', type: 'mcq', topic: 'IAS 41 Agriculture', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">Which of the following fall within the scope of IAS 41 <em>Agriculture</em>?</p>
+          <ol class="list-none pl-2 space-y-1.5 mb-2">
+            <li>(1) Sheep</li>
+            <li>(2) Wool</li>
+            <li>(3) Wine</li>
+            <li>(4) Vines</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '1 and 2 only' },
+          { key: 'B', text: '2 and 3 only' },
+          { key: 'C', text: '1, 3 and 4 only' },
+          { key: 'D', text: '1, 2, 3 and 4' }
+        ],
+        correct: 'A',
+        explanation: `• <strong>(1) Sheep</strong>: Biological asset → <strong>IAS 41</strong>.<br>• <strong>(2) Wool</strong>: Agricultural produce at point of harvest → <strong>IAS 41</strong>.<br>• <strong>(3) Wine</strong>: Result of processing after harvest → <strong>IAS 2 Inventories</strong>.<br>• <strong>(4) Vines</strong>: Bearer plants → excluded from IAS 41 and accounted for under <strong>IAS 16</strong>.<br><span class="text-amber-800 font-medium">Accuracy Note:</span> Corrected from the ClassMarker printout (which accidentally ticked B even though its own explanation confirmed wine &amp; vines are excluded).`
+      },
+      {
+        num: 16, section: 'A', type: 'mcq', topic: 'IAS 2 Inventories', marks: 2,
+        stem: `<p class="font-semibold text-slate-900 mb-2">According to IAS 2 <em>Inventories</em>, which of the following costs should be included in valuing the inventories of a manufacturing company?</p>
+          <ol class="list-decimal pl-5 space-y-1 mb-2">
+            <li>Carriage inwards</li>
+            <li>Carriage outwards</li>
+            <li>Depreciation of factory plant</li>
+            <li>General administrative overheads</li>
+          </ol>`,
+        options: [
+          { key: 'A', text: '1 and 3' },
+          { key: 'B', text: '1, 2 and 4' },
+          { key: 'C', text: '2 and 3 only' },
+          { key: 'D', text: '2, 3 and 4' }
+        ],
+        correct: 'A',
+        explanation: `Under <strong>IAS 2.10–16</strong>, carriage inwards (cost of purchase) and depreciation of factory plant (fixed production overhead) are included. Carriage outwards (selling/distribution) and general administrative overheads are excluded.`
+      },
+      {
+        num: 17, section: 'A', type: 'mcq', topic: 'IAS 12 Deferred Tax', marks: 2,
+        stem: `<p class="mb-2">The following information relates to Shipwell for the year ended 30 June 20X3:</p>
+          <ul class="list-disc pl-5 space-y-1.5 mb-3">
+            <li>Revaluation of a property, which Shipwell is not planning to sell, giving rise to a revaluation surplus of $320,000 which is not recognised for tax purposes</li>
+            <li>Tax allowable depreciation for the year was $270,000 and depreciation expense to profit or loss was $210,000</li>
+            <li>At 1 July 20X2, non-current assets had a carrying amount of $560,000 and a tax base of $420,000</li>
+            <li>There were no asset additions or disposals during the year</li>
+            <li>The income tax rate is 25%</li>
+          </ul>
+          <p class="font-semibold text-slate-900">What is the deferred tax liability at 30 June 20X3?</p>`,
+        options: [
+          { key: 'A', text: '$130,000' },
+          { key: 'B', text: '$100,000' },
+          { key: 'C', text: '$95,000' },
+          { key: 'D', text: '$50,000' }
+        ],
+        correct: 'A',
+        explanation: `• Closing carrying amount = $560,000 − $210,000 + $320,000 = $670,000.<br>• Closing tax base = $420,000 − $270,000 = $150,000.<br>• Taxable temporary difference = $670,000 − $150,000 = $520,000.<br>• Deferred tax liability @ 25% = $520,000 × 25% = <strong>$130,000</strong>.`
+      },
+      {
+        num: 18, section: 'A', type: 'mcq', topic: 'IFRS 5 Held for Sale', marks: 2,
+        stem: `<p class="mb-3">For an asset to be classified as held for sale in accordance with IFRS 5, it must be available for immediate sale in its present condition and the sale must be highly probable.</p><p class="font-semibold text-slate-900">Which of the following conditions would most likely satisfy the highly probable criterion?</p>`,
+        options: [
+          { key: 'A', text: 'The asset is being marketed at a reasonable price for its nature and condition' },
+          { key: 'B', text: 'A board meeting has been arranged to discuss sale of the asset' },
+          { key: 'C', text: 'Disposal of the asset will not adversely affect the entity’s operations' },
+          { key: 'D', text: 'When the asset is sold the entity will use the funds to pay a dividend' }
+        ],
+        correct: 'A',
+        explanation: `Under <strong>IFRS 5.8</strong>, actively marketing the asset for sale at a price that is reasonable in relation to its current fair value (<strong>A</strong>) is a required indicator that a sale is highly probable.`
+      }
+    ]
+  }
+];
+
+// ============================================================================
+// APPLICATION STATE
+// ============================================================================
+const STORAGE_KEY = 'acca_fr_cbe_state_v1';
+
+let state = {
+  view: 'home', // 'home' | 'instructions' | 'exam' | 'review_screen' | 'results'
+  activeExamId: null,
+  timerMode: { exam1: 'acca', exam2: 'acca', exam3: 'acca' }, // 'acca' | 'paper' | 'untimed'
+  currentQIndex: 0,
+  answers: {},      // { [examId]: { [qNum]: value } }
+  flags: {},        // { [examId]: { [qNum]: true } }
+  visited: {},      // { [examId]: { [qNum]: true } }
+  struck: {},       // { [examId]: { [`${qNum}_${key}`]: true } }
+  scratchpad: { exam1: '', exam2: '', exam3: '' },
+  highlights: {},   // { [examId]: { [key]: html } }
+  savedTimers: {},  // { [examId]: { timeRemainingSec, elapsedSec, mode } }
+  timeRemainingSec: 0,
+  elapsedSec: 0,
+  timerHidden: false,
+  timerPaused: false,
+  highlightMode: false,
+  strikeMode: false,
+  showCalc: false,
+  showScratch: false,
+  calcPos: { left: null, top: 112 },
+  scratchPos: { left: 16, top: 112 },
+  showNavigator: false,
+  navFilter: 'all', // 'all' | 'incomplete' | 'flagged'
+  showHelpModal: false,
+  showSubmitModal: false,
+  resultsFilter: 'all', // 'all' | 'incorrect' | 'correct' | 'flagged'
+  multiNotice: '',
+  toastMsg: '',
+  history: {}, // { [examId]: { score, total, pct, date, timeTakenSec, mode } }
+  calcDisplay: '0',
+  calcExpr: '',
+  calcResetNext: false
+};
+
+let timerInterval = null;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.history) state.history = parsed.history;
+      if (parsed.scratchpad) state.scratchpad = Object.assign(state.scratchpad, parsed.scratchpad);
+      if (parsed.answers) state.answers = parsed.answers;
+      if (parsed.flags) state.flags = parsed.flags;
+      if (parsed.visited) state.visited = parsed.visited;
+      if (parsed.struck) state.struck = parsed.struck;
+      if (parsed.timerMode) state.timerMode = Object.assign(state.timerMode, parsed.timerMode);
+      if (parsed.savedTimers) state.savedTimers = parsed.savedTimers;
+    }
+  } catch (e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      history: state.history,
+      scratchpad: state.scratchpad,
+      answers: state.answers,
+      flags: state.flags,
+      visited: state.visited,
+      struck: state.struck,
+      timerMode: state.timerMode,
+      savedTimers: state.savedTimers
+    }));
+  } catch (e) {}
+}
+
+function getExam(id = state.activeExamId) {
+  return EXAMS.find(e => e.id === id);
+}
+
+function getExamAnswers(examId = state.activeExamId) {
+  if (!state.answers[examId]) state.answers[examId] = {};
+  return state.answers[examId];
+}
+
+function getExamFlags(examId = state.activeExamId) {
+  if (!state.flags[examId]) state.flags[examId] = {};
+  return state.flags[examId];
+}
+
+function getExamVisited(examId = state.activeExamId) {
+  if (!state.visited[examId]) state.visited[examId] = {};
+  return state.visited[examId];
+}
+
+function getExamStruck(examId = state.activeExamId) {
+  if (!state.struck[examId]) state.struck[examId] = {};
+  return state.struck[examId];
+}
+
+function isQuestionAnswered(q, ans) {
+  if (ans === undefined || ans === null) return false;
+  if (q.type === 'mcq') return typeof ans === 'string' && ans.length > 0;
+  if (q.type === 'multi') return Array.isArray(ans) && ans.length === q.selectCount;
+  if (q.type === 'number') return typeof ans === 'string' && ans.trim().length > 0;
+  if (q.type === 'tf_matrix') return typeof ans === 'object' && q.rows.every(r => ans[r.id] === 'True' || ans[r.id] === 'False');
+  if (q.type === 'dropdown_table') return typeof ans === 'object' && q.rows.every(r => ans[r.id] && ans[r.id].length > 0);
+  return false;
+}
+
+function isQuestionPartial(q, ans) {
+  if (!ans) return false;
+  if (isQuestionAnswered(q, ans)) return false;
+  if (q.type === 'multi') return Array.isArray(ans) && ans.length > 0;
+  if (q.type === 'tf_matrix' || q.type === 'dropdown_table') return typeof ans === 'object' && Object.values(ans).some(v => v && v.length > 0);
+  return false;
+}
+
+function normalizeNum(str) {
+  return String(str || '').toLowerCase().replace(/[\$,\s]/g, '').replace(/million/g, 'million');
+}
+
+function isAnswerCorrect(q, ans) {
+  if (!isQuestionAnswered(q, ans)) return false;
+  if (q.type === 'mcq') return ans === q.correct;
+  if (q.type === 'multi') {
+    const a = [...ans].sort().join(',');
+    const c = [...q.correct].sort().join(',');
+    return a === c;
+  }
+  if (q.type === 'number') {
+    const norm = normalizeNum(ans);
+    return q.accepted.some(acc => {
+      const aNorm = normalizeNum(acc);
+      if (norm === aNorm) return true;
+      const n1 = parseFloat(norm);
+      const n2 = parseFloat(aNorm);
+      return !isNaN(n1) && !isNaN(n2) && norm.replace(/[^\d.-]/g,'') === norm && Math.abs(n1 - n2) < 0.001;
+    });
+  }
+  if (q.type === 'tf_matrix' || q.type === 'dropdown_table') {
+    return q.rows.every(r => ans[r.id] === r.correct);
+  }
+  return false;
+}
+
+function formatTime(totalSec) {
+  const s = Math.max(0, Math.floor(totalSec));
+  const hrs = Math.floor(s / 3600);
+  const mins = Math.floor((s % 3600) / 60);
+  const secs = s % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+}
+
+function startTimer() {
+  stopTimer();
+  const exam = getExam();
+  const mode = state.timerMode[exam.id] || 'acca';
+  timerInterval = setInterval(() => {
+    if (state.view !== 'exam' && state.view !== 'review_screen') return;
+    if (state.timerPaused) return;
+    state.elapsedSec += 1;
+    if (mode !== 'untimed') {
+      state.timeRemainingSec -= 1;
+      if (state.timeRemainingSec <= 0) {
+        state.timeRemainingSec = 0;
+        stopTimer();
+        submitExam(true);
+        return;
+      }
+    }
+    state.savedTimers[exam.id] = { timeRemainingSec: state.timeRemainingSec, elapsedSec: state.elapsedSec, mode };
+    if (state.elapsedSec % 5 === 0) saveState();
+    updateTimerDOM();
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function updateTimerDOM() {
+  const el = document.getElementById('cbe-timer-val');
+  const pill = document.getElementById('cbe-timer-pill');
+  if (!el || !pill) return;
+  const exam = getExam();
+  const mode = state.timerMode[exam.id] || 'acca';
+  if (state.timerHidden) {
+    el.textContent = 'Hidden';
+    pill.className = 'flex items-center gap-2 px-3 py-1 rounded text-xs sm:text-sm font-mono-num bg-slate-700/70 text-slate-200 cursor-pointer border border-slate-500/50';
+    return;
+  }
+  if (mode === 'untimed') {
+    el.textContent = formatTime(state.elapsedSec);
+    pill.className = 'flex items-center gap-2 px-3 py-1 rounded text-xs sm:text-sm font-mono-num bg-slate-800/70 text-white cursor-pointer border border-slate-500/50';
+  } else {
+    el.textContent = formatTime(state.timeRemainingSec);
+    let cls = 'flex items-center gap-2 px-3 py-1 rounded text-xs sm:text-sm font-mono-num cursor-pointer border ';
+    if (state.timeRemainingSec <= 300) {
+      cls += 'timer-critical text-white border-red-400 font-bold';
+    } else if (state.timeRemainingSec <= 900) {
+      cls += 'bg-amber-600 text-white border-amber-400 font-semibold';
+    } else {
+      cls += 'bg-slate-900/50 text-white border-slate-500/50';
+    }
+    pill.className = cls;
+  }
+}
+
+// ============================================================================
+// EXAM FLOW ACTIONS
+// ============================================================================
+function openInstructions(examId) {
+  state.activeExamId = examId;
+  state.view = 'instructions';
+  render();
+}
+
+function launchExam(examId, resetAnswers = false) {
+  state.activeExamId = examId;
+  const exam = getExam(examId);
+  const mode = state.timerMode[examId] || 'acca';
+  const mins = mode === 'acca' ? exam.accaMinutes : (mode === 'paper' ? exam.paperMinutes : 0);
+  if (resetAnswers) {
+    state.answers[examId] = {};
+    state.flags[examId] = {};
+    state.visited[examId] = {};
+    state.struck[examId] = {};
+    state.highlights[examId] = {};
+    delete state.savedTimers[examId];
+    state.timeRemainingSec = mins * 60;
+    state.elapsedSec = 0;
+    saveState();
+  } else {
+    const saved = state.savedTimers[examId];
+    if (saved && saved.mode === mode && saved.elapsedSec > 0) {
+      state.timeRemainingSec = saved.timeRemainingSec;
+      state.elapsedSec = saved.elapsedSec;
+    } else {
+      state.timeRemainingSec = mins * 60;
+      state.elapsedSec = 0;
+    }
+  }
+  state.multiNotice = '';
+  state.currentQIndex = 0;
+  state.timerPaused = false;
+  state.timerHidden = false;
+  state.highlightMode = false;
+  state.strikeMode = false;
+  state.showNavigator = false;
+  state.showSubmitModal = false;
+  state.showHelpModal = false;
+  getExamVisited(examId)[1] = true;
+  state.view = 'exam';
+  startTimer();
+  render();
+}
+
+function goToQuestion(index) {
+  const exam = getExam();
+  if (index < 0 || index >= exam.questions.length) return;
+  state.currentQIndex = index;
+  state.multiNotice = '';
+  const q = exam.questions[index];
+  getExamVisited(exam.id)[q.num] = true;
+  state.view = 'exam';
+  state.showNavigator = false;
+  saveState();
+  render();
+  const mainPane = document.getElementById('question-pane');
+  if (mainPane) mainPane.scrollTop = 0;
+}
+
+function submitExam(autoTimeout = false) {
+  stopTimer();
+  const exam = getExam();
+  const ansMap = getExamAnswers(exam.id);
+  let correctCount = 0;
+  exam.questions.forEach(q => {
+    if (isAnswerCorrect(q, ansMap[q.num])) correctCount += 1;
+  });
+  const score = correctCount * exam.marksPerQuestion;
+  const pct = Math.round((score / exam.totalMarks) * 100);
+  state.history[exam.id] = {
+    score,
+    total: exam.totalMarks,
+    correctCount,
+    pct,
+    date: new Date().toLocaleString(),
+    timeTakenSec: state.elapsedSec,
+    mode: state.timerMode[exam.id] || 'acca',
+    autoTimeout
+  };
+  state.showSubmitModal = false;
+  state.showNavigator = false;
+  state.showCalc = false;
+  state.showScratch = false;
+  state.resultsFilter = 'all';
+  delete state.savedTimers[exam.id];
+  state.view = 'results';
+  saveState();
+  render();
+}
+
+// ============================================================================
+// HIGHLIGHTER TOOL (Authentic ACCA CBE yellow highlight)
+// ============================================================================
+function applyHighlightSelection() {
+  if (!state.highlightMode) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const container = range.commonAncestorContainer;
+  const host = (container.nodeType === 1 ? container : container.parentElement).closest('[data-highlightable="true"]');
+  if (!host) return;
+  try {
+    const span = document.createElement('span');
+    span.className = 'cbe-highlight';
+    range.surroundContents(span);
+    sel.removeAllRanges();
+    const key = host.getAttribute('data-hl-key');
+    if (!state.highlights[state.activeExamId]) state.highlights[state.activeExamId] = {};
+    state.highlights[state.activeExamId][key] = host.innerHTML;
+  } catch (e) {
+    // Selection spans across multiple block nodes
+    sel.removeAllRanges();
+  }
+}
+
+function clearCurrentHighlights() {
+  if (state.highlights[state.activeExamId]) {
+    const exam = getExam();
+    const q = exam.questions[state.currentQIndex];
+    delete state.highlights[state.activeExamId][`q_${q.num}`];
+    if (q.scenarioId) delete state.highlights[state.activeExamId][`sc_${q.scenarioId}`];
+  }
+  render();
+}
+
+// ============================================================================
+// CALCULATOR LOGIC
+// ============================================================================
+function calcPress(val) {
+  if (val === 'C') {
+    state.calcDisplay = '0';
+    state.calcExpr = '';
+    state.calcResetNext = false;
+  } else if (val === 'CE') {
+    state.calcDisplay = '0';
+  } else if (val === 'BACK') {
+    state.calcDisplay = state.calcDisplay.length > 1 ? state.calcDisplay.slice(0, -1) : '0';
+  } else if (val === 'SQRT') {
+    const n = parseFloat(state.calcDisplay);
+    state.calcDisplay = (!isNaN(n) && n >= 0) ? String(Number(Math.sqrt(n).toFixed(8))) : 'Error';
+    state.calcResetNext = true;
+  } else if (val === 'SIGN') {
+    if (state.calcDisplay !== '0' && state.calcDisplay !== 'Error') {
+      state.calcDisplay = state.calcDisplay.startsWith('-') ? state.calcDisplay.slice(1) : '-' + state.calcDisplay;
+    }
+  } else if (val === '%') {
+    const n = parseFloat(state.calcDisplay);
+    if (!isNaN(n)) state.calcDisplay = String(Number((n / 100).toFixed(8)));
+  } else if (['+', '-', '*', '/'].includes(val)) {
+    state.calcExpr = state.calcDisplay + ' ' + val + ' ';
+    state.calcResetNext = true;
+  } else if (val === '=') {
+    try {
+      const expr = (state.calcExpr + state.calcDisplay).replace(/[^0-9+\-*/.() ]/g, '');
+      const result = Function('"use strict"; return (' + expr + ')')();
+      if (!isFinite(result) || isNaN(result)) {
+        state.calcDisplay = 'Error';
+      } else {
+        state.calcDisplay = String(Number(result.toFixed(8)));
+      }
+      state.calcExpr = '';
+      state.calcResetNext = true;
+    } catch (e) {
+      state.calcDisplay = 'Error';
+      state.calcExpr = '';
+      state.calcResetNext = true;
+    }
+  } else {
+    if (state.calcResetNext || state.calcDisplay === '0' || state.calcDisplay === 'Error') {
+      state.calcDisplay = val === '.' ? '0.' : val;
+      state.calcResetNext = false;
+    } else {
+      if (val === '.' && state.calcDisplay.includes('.')) return;
+      state.calcDisplay += val;
+    }
+  }
+  const disp = document.getElementById('calc-display');
+  const expEl = document.getElementById('calc-expr');
+  if (disp) disp.textContent = state.calcDisplay;
+  if (expEl) expEl.textContent = state.calcExpr || '\u00A0';
+}
+
+function updateAnsweredCountDOM() {
+  const el = document.getElementById('cbe-answered-count');
+  if (!el) return;
+  const exam = getExam();
+  if (!exam) return;
+  const ansMap = getExamAnswers(exam.id);
+  const answeredCount = exam.questions.filter(item => isQuestionAnswered(item, ansMap[item.num])).length;
+  el.textContent = `${answeredCount}/${exam.totalQuestions}`;
+}
+
+function updateNumPreviewDOM(q, rawVal) {
+  const prev = document.getElementById('num-preview-val');
+  if (!prev) return;
+  const cleaned = String(rawVal || '').trim();
+  if (!cleaned) {
+    prev.textContent = '';
+    return;
+  }
+  prev.textContent = `Preview: ${q.prefix || ''}${cleaned}${q.suffix ? ' ' + q.suffix : ''}`;
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  state.toastMsg = msg;
+  const el = document.getElementById('cbe-toast');
+  if (el) {
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    state.toastMsg = '';
+    const t = document.getElementById('cbe-toast');
+    if (t) t.classList.add('hidden');
+  }, 2200);
+}
+
+// ============================================================================
+// RENDER FUNCTIONS
+// ============================================================================
+function render() {
+  const root = document.getElementById('app');
+  if (state.view === 'home') {
+    root.innerHTML = renderHome();
+  } else if (state.view === 'instructions') {
+    root.innerHTML = renderInstructions();
+  } else if (state.view === 'exam') {
+    root.innerHTML = renderExamShell();
+    updateTimerDOM();
+  } else if (state.view === 'review_screen') {
+    root.innerHTML = renderReviewScreen();
+    updateTimerDOM();
+  } else if (state.view === 'results') {
+    root.innerHTML = renderResults();
+  }
+  attachEventListeners();
+}
+
+function renderHome() {
+  return `
+    <header class="cbe-header text-white shadow-md">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded bg-[#d31245] flex items-center justify-center font-bold text-white tracking-tight text-sm shadow">
+            ACCA
+          </div>
+          <div>
+            <div class="text-xs uppercase tracking-wider text-slate-300 font-medium">CBE Practice Platform</div>
+            <h1 class="text-lg sm:text-xl font-bold leading-tight">Financial Reporting (FR) Exam Simulator</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 text-xs sm:text-sm">
+          <span class="px-3 py-1 rounded bg-white/10 border border-white/20 text-slate-100">
+            ACCA Standard Pace: <strong>1.8 min / mark</strong>
+          </span>
+          <span class="hidden sm:inline-block px-3 py-1 rounded bg-white/10 border border-white/20 text-slate-100">
+            Pass Mark: <strong>50%</strong>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div class="bg-white border border-slate-200 rounded-lg p-5 mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Ready for your FR Computer-Based Exam</h2>
+          <p class="text-sm text-slate-600 mt-1">
+            All ${EXAMS.length} question papers are loaded in full (${EXAMS.reduce((a, e) => a + e.totalQuestions, 0)} questions total, ${EXAMS.reduce((a, e) => a + e.totalMarks, 0)} marks) with authentic ACCA CBE tools: split-screen Section B cases, ACCA standard timer (1.8 min/mark), draggable calculator &amp; scratch pad, highlighter, strikethrough, navigator, and verified IFRS/IAS worked solutions.
+          </p>
+        </div>
+        <div class="flex items-center gap-4 shrink-0 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-md px-4 py-2.5">
+          <div><div class="font-bold text-slate-900 text-base">${EXAMS.length}</div>Exams</div>
+          <div class="h-7 w-px bg-slate-200"></div>
+          <div><div class="font-bold text-slate-900 text-base">${EXAMS.reduce((a, e) => a + e.totalQuestions, 0)}</div>Questions</div>
+          <div class="h-7 w-px bg-slate-200"></div>
+          <div><div class="font-bold text-slate-900 text-base">${EXAMS.reduce((a, e) => a + e.totalMarks, 0)}</div>Marks</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        ${EXAMS.map((exam, idx) => {
+          const mode = state.timerMode[exam.id] || 'acca';
+          const ansMap = state.answers[exam.id] || {};
+          const answeredCount = exam.questions.filter(q => isQuestionAnswered(q, ansMap[q.num])).length;
+          const hist = state.history[exam.id];
+          return `
+            <div class="bg-white border border-slate-300 rounded-lg shadow-sm overflow-hidden flex flex-col">
+              <div class="bg-[#1b365d] text-white px-5 py-3.5 flex items-center justify-between">
+                <div>
+                  <span class="text-[11px] uppercase tracking-wider bg-[#d31245] text-white px-2 py-0.5 rounded font-semibold">Exam ${idx + 1}</span>
+                  <h3 class="text-base sm:text-lg font-bold mt-1.5">${exam.title}</h3>
+                </div>
+                <div class="text-right">
+                  <div class="text-xl font-bold font-mono-num">${exam.totalMarks}</div>
+                  <div class="text-[11px] text-slate-300 uppercase">Marks</div>
+                </div>
+              </div>
+
+              <div class="p-5 flex-1 flex flex-col">
+                <p class="text-xs text-slate-500 mb-4">${exam.subtitle}</p>
+
+                <div class="grid grid-cols-2 gap-2.5 mb-4 text-xs">
+                  ${exam.sections.map(sec => `
+                    <div class="bg-slate-50 border border-slate-200 rounded p-2.5">
+                      <div class="font-semibold text-slate-800">${sec.id === 'A' ? 'Section A' : 'Section B'} (Q${sec.range[0]}–Q${sec.range[1]})</div>
+                      <div class="text-slate-600 mt-0.5">${sec.description}</div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <div class="mb-4">
+                  <div class="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Select Exam Timer Mode</div>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button type="button" data-action="set-timer-mode" data-exam="${exam.id}" data-mode="acca"
+                      class="p-2 rounded border text-left transition ${mode === 'acca' ? 'border-[#1b365d] bg-blue-50 ring-1 ring-[#1b365d]' : 'border-slate-200 hover:bg-slate-50'}">
+                      <div class="text-xs font-bold text-slate-900">ACCA Std</div>
+                      <div class="text-[11px] text-slate-600">${exam.accaMinutes} mins (1.8m/mk)</div>
+                    </button>
+                    <button type="button" data-action="set-timer-mode" data-exam="${exam.id}" data-mode="paper"
+                      class="p-2 rounded border text-left transition ${mode === 'paper' ? 'border-[#1b365d] bg-blue-50 ring-1 ring-[#1b365d]' : 'border-slate-200 hover:bg-slate-50'}">
+                      <div class="text-xs font-bold text-slate-900">Paper Time</div>
+                      <div class="text-[11px] text-slate-600">${exam.paperMinutes} mins</div>
+                    </button>
+                    <button type="button" data-action="set-timer-mode" data-exam="${exam.id}" data-mode="untimed"
+                      class="p-2 rounded border text-left transition ${mode === 'untimed' ? 'border-[#1b365d] bg-blue-50 ring-1 ring-[#1b365d]' : 'border-slate-200 hover:bg-slate-50'}">
+                      <div class="text-xs font-bold text-slate-900">Untimed</div>
+                      <div class="text-[11px] text-slate-600">Stopwatch</div>
+                    </button>
+                  </div>
+                </div>
+
+                ${hist ? `
+                  <div class="mb-4 px-3 py-2.5 rounded border ${hist.pct >= 50 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'} text-xs flex items-center justify-between">
+                    <div>
+                      <span class="font-bold">Last Attempt: ${hist.score}/${hist.total} (${hist.pct}%)</span>
+                      <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${hist.pct >= 50 ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">${hist.pct >= 50 ? 'PASS' : 'FAIL'}</span>
+                    </div>
+                    <button type="button" data-action="view-last-results" data-exam="${exam.id}" class="underline font-semibold hover:opacity-80">Review Answers</button>
+                  </div>
+                ` : ''}
+
+                <div class="mt-auto pt-2 flex flex-wrap items-center gap-2.5">
+                  <button type="button" data-action="open-instructions" data-exam="${exam.id}"
+                    class="flex-1 bg-[#1b365d] hover:bg-[#132744] text-white font-semibold py-2.5 px-4 rounded text-sm transition shadow-sm">
+                    ${answeredCount > 0 && !hist ? `Start / Resume (${answeredCount}/${exam.totalQuestions})` : 'Launch CBE Exam'}
+                  </button>
+                  ${answeredCount > 0 ? `
+                    <button type="button" data-action="fresh-start" data-exam="${exam.id}"
+                      class="px-3.5 py-2.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition">
+                      Reset
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-xs text-slate-500">
+      ACCA FR Computer-Based Exam Practice Interface • Built for Financial Reporting (FR) Exam Preparation
+    </footer>
+  `;
+}
+
+function renderInstructions() {
+  const exam = getExam();
+  const mode = state.timerMode[exam.id] || 'acca';
+  const mins = mode === 'acca' ? exam.accaMinutes : (mode === 'paper' ? exam.paperMinutes : 0);
+  const ansMap = state.answers[exam.id] || {};
+  const savedCount = exam.questions.filter(q => isQuestionAnswered(q, ansMap[q.num])).length;
+
+  return `
+    <header class="cbe-header text-white px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="px-2 py-0.5 rounded bg-[#d31245] font-bold text-xs">ACCA</span>
+        <span class="font-semibold text-sm sm:text-base">${exam.title}</span>
+      </div>
+      <button type="button" data-action="go-home" class="text-xs text-slate-200 hover:text-white underline">Back to Exam Portal</button>
+    </header>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
+      <div class="bg-white border border-slate-300 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-[#eef2f6] border-b border-slate-300 px-6 py-4">
+          <h2 class="text-lg font-bold text-slate-900">Exam Instructions &amp; Summary</h2>
+          <p class="text-xs text-slate-600 mt-0.5">${exam.subtitle}</p>
+        </div>
+
+        <div class="p-6 space-y-5 text-sm text-slate-700">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="bg-slate-50 border border-slate-200 rounded p-3.5">
+              <div class="text-xs text-slate-500 uppercase font-semibold">Time Allowed</div>
+              <div class="text-lg font-bold text-[#1b365d] mt-0.5">${mode === 'untimed' ? 'Untimed (Stopwatch)' : `${mins} Minutes`}</div>
+              <div class="text-xs text-slate-500">${mode === 'acca' ? 'ACCA Standard (1.8 min/mark)' : (mode === 'paper' ? 'Paper Stated Time' : 'Practice Mode')}</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded p-3.5">
+              <div class="text-xs text-slate-500 uppercase font-semibold">Total Marks</div>
+              <div class="text-lg font-bold text-[#1b365d] mt-0.5">${exam.totalMarks} Marks</div>
+              <div class="text-xs text-slate-500">${exam.totalQuestions} questions × 2 marks each</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded p-3.5">
+              <div class="text-xs text-slate-500 uppercase font-semibold">Pass Standard</div>
+              <div class="text-lg font-bold text-[#1b365d] mt-0.5">50% (${Math.ceil(exam.totalMarks * 0.5)} Marks)</div>
+              <div class="text-xs text-slate-500">All questions are compulsory</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-slate-900 mb-2">Structure of this Examination</h3>
+            <ul class="list-disc pl-5 space-y-1.5">
+              ${exam.sections.map(s => `<li><strong>${s.name} (Questions ${s.range[0]} to ${s.range[1]}):</strong> ${s.description}.</li>`).join('')}
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-slate-900 mb-2">CBE Tools Available During Your Exam</h3>
+            <ul class="list-disc pl-5 space-y-1.5">
+              <li><strong>Highlight &amp; Strikethrough:</strong> Highlight key figures in scenarios or cross out eliminated MCQ options (you can also right-click any option to strike it through).</li>
+              <li><strong>Calculator &amp; Scratch Pad:</strong> Accessible at any time from the top toolbar for workings (e.g. lease tables, WANOS, deferred tax).</li>
+              <li><strong>Navigator &amp; Flag for Review:</strong> Jump directly to any question, filter incomplete or flagged items, and review all responses before ending the exam.</li>
+              <li><strong>Numerical Entry:</strong> Enter numbers without currency symbols (e.g. <code>19440</code> or <code>42</code> for $'000).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-[#eef2f6] border-t border-slate-300 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+          <button type="button" data-action="go-home" class="px-4 py-2 rounded border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 text-sm font-medium">
+            Cancel
+          </button>
+          <div class="flex items-center gap-3">
+            ${savedCount > 0 ? `
+              <button type="button" data-action="start-exam-resume" data-exam="${exam.id}"
+                class="px-5 py-2.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold shadow-sm">
+                Resume Saved (${savedCount}/${exam.totalQuestions})
+              </button>
+            ` : ''}
+            <button type="button" data-action="start-exam-fresh" data-exam="${exam.id}"
+              class="px-6 py-2.5 rounded bg-[#1b365d] hover:bg-[#132744] text-white text-sm font-semibold shadow-sm">
+              ${savedCount > 0 ? 'Start Fresh Exam' : 'Start Exam →'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  `;
+}
+
+function renderExamShell() {
+  const exam = getExam();
+  const q = exam.questions[state.currentQIndex];
+  const ansMap = getExamAnswers(exam.id);
+  const flagMap = getExamFlags(exam.id);
+  const isFlagged = !!flagMap[q.num];
+  const answeredCount = exam.questions.filter(item => isQuestionAnswered(item, ansMap[item.num])).length;
+  const scenario = q.scenarioId ? exam.scenarios[q.scenarioId] : null;
+  const mode = state.timerMode[exam.id] || 'acca';
+
+  // Get highlighted HTML if stored
+  const hlMap = state.highlights[exam.id] || {};
+  const stemHtml = hlMap[`q_${q.num}`] || q.stem;
+  const scenarioHtml = scenario ? (hlMap[`sc_${scenario.id}`] || scenario.html) : '';
+
+  // Scenario sibling questions
+  const scenarioQuestions = scenario ? exam.questions.filter(item => item.scenarioId === scenario.id) : [];
+
+  return `
+    <div class="h-screen overflow-hidden flex flex-col bg-[#f4f6f9]">
+    <!-- TOP ACCA CBE HEADER -->
+    <header class="cbe-header text-white px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 shrink-0 select-none">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="px-2 py-0.5 rounded bg-[#d31245] font-bold text-xs shrink-0">ACCA</span>
+        <div class="truncate">
+          <div class="text-xs sm:text-sm font-semibold truncate">${exam.title}</div>
+          <div class="text-[11px] text-slate-300 hidden sm:block">Section ${q.section} • ${q.topic} • ${q.marks} Marks</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div class="hidden md:flex items-center gap-1.5 text-xs text-slate-200 bg-white/10 px-2.5 py-1 rounded">
+          <span>Answered:</span>
+          <strong id="cbe-answered-count" class="font-mono-num">${answeredCount}/${exam.totalQuestions}</strong>
+        </div>
+
+        <button type="button" id="cbe-timer-pill" data-action="toggle-timer-visibility" title="Click to hide/show timer"
+          class="flex items-center gap-2 px-3 py-1 rounded text-xs sm:text-sm font-mono-num bg-slate-900/50 text-white cursor-pointer border border-slate-500/50">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span id="cbe-timer-val">${mode === 'untimed' ? formatTime(state.elapsedSec) : formatTime(state.timeRemainingSec)}</span>
+        </button>
+
+        <button type="button" data-action="toggle-pause" title="${state.timerPaused ? 'Resume Timer' : 'Pause Timer'}"
+          class="px-2 py-1 rounded text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white">
+          ${state.timerPaused ? '▶' : '⏸'}
+        </button>
+
+        <div class="text-xs sm:text-sm font-semibold bg-white/15 px-2.5 py-1 rounded">
+          Q ${q.num} of ${exam.totalQuestions}
+        </div>
+      </div>
+    </header>
+
+    <!-- SECONDARY CBE TOOLBAR -->
+    <div class="cbe-toolbar px-3 sm:px-5 py-1.5 flex items-center justify-between gap-2 flex-wrap shrink-0 select-none">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <button type="button" data-action="toggle-calc" class="cbe-btn-tool ${state.showCalc ? 'active' : ''}">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18.01"/></svg>
+          <span>Calculator</span>
+        </button>
+        <button type="button" data-action="toggle-scratch" class="cbe-btn-tool ${state.showScratch ? 'active' : ''}">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span>Scratch Pad</span>
+        </button>
+        <button type="button" data-action="toggle-highlight" class="cbe-btn-tool ${state.highlightMode ? 'active' : ''}" title="Select text to highlight in yellow">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+          <span>Highlight</span>
+        </button>
+        ${state.highlightMode ? `
+          <button type="button" data-action="clear-highlights" class="cbe-btn-tool text-xs">Clear HL</button>
+        ` : ''}
+        <button type="button" data-action="toggle-strike" class="cbe-btn-tool ${state.strikeMode ? 'active' : ''}" title="Click options to cross them out">
+          <span class="font-bold line-through text-xs">S</span>
+          <span>Strikethrough</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button type="button" data-action="toggle-flag" class="cbe-btn-tool ${isFlagged ? 'flagged' : ''}">
+          <svg class="w-3.5 h-3.5" fill="${isFlagged ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          <span>${isFlagged ? 'Flagged' : 'Flag for Review'}</span>
+        </button>
+        <button type="button" data-action="toggle-help" class="cbe-btn-tool">
+          <span>Help</span>
+        </button>
+      </div>
+    </div>
+
+    ${state.timerPaused ? `
+      <div class="bg-amber-100 border-b border-amber-300 px-4 py-2 text-xs text-amber-900 flex items-center justify-between">
+        <span><strong>Timer Paused</strong> — Click Resume when you are ready to continue.</span>
+        <button type="button" data-action="toggle-pause" class="px-3 py-1 rounded bg-amber-700 text-white font-semibold">Resume</button>
+      </div>
+    ` : ''}
+
+    <!-- MAIN EXAM WORKSPACE -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden ${state.highlightMode ? 'highlight-mode-cursor' : ''} ${state.strikeMode ? 'strikethrough-mode-cursor' : ''}" style="min-height: 0;">
+      ${scenario ? `
+        <!-- LEFT PANE: SCENARIO EXHIBIT (SPLIT SCREEN) -->
+        <section class="lg:w-1/2 max-h-[45vh] lg:max-h-none border-b lg:border-b-0 lg:border-r border-slate-300 bg-white flex flex-col overflow-hidden">
+          <div class="bg-[#e8edf2] border-b border-slate-300 px-4 py-2 flex items-center justify-between shrink-0">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wide text-[#1b365d]">Scenario Exhibit</span>
+              <span class="mx-1.5 text-slate-400">|</span>
+              <span class="text-xs font-semibold text-slate-800">${scenario.title} (${scenario.rangeLabel})</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-white border border-slate-300 text-slate-600">${scenario.topic}</span>
+          </div>
+          <div class="p-5 overflow-y-auto cbe-scroll text-[14.5px] leading-relaxed text-slate-800 flex-1" data-highlightable="true" data-hl-key="sc_${scenario.id}">
+            ${scenarioHtml}
+          </div>
+        </section>
+      ` : ''}
+
+      <!-- RIGHT / FULL PANE: QUESTION & RESPONSE AREA -->
+      <section id="question-pane" class="${scenario ? 'lg:w-1/2' : 'w-full max-w-4xl mx-auto'} bg-white flex-1 flex flex-col overflow-y-auto cbe-scroll">
+        ${scenario ? `
+          <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center gap-1.5 flex-wrap shrink-0">
+            <span class="text-xs font-semibold text-slate-500 mr-1">Case Questions:</span>
+            ${scenarioQuestions.map(sq => {
+              const sIdx = exam.questions.findIndex(item => item.num === sq.num);
+              const sAns = isQuestionAnswered(sq, ansMap[sq.num]);
+              const sFlg = !!flagMap[sq.num];
+              const active = sq.num === q.num;
+              return `
+                <button type="button" data-action="goto-q" data-index="${sIdx}"
+                  class="px-2.5 py-1 rounded text-xs font-semibold border transition flex items-center gap-1 ${
+                    active ? 'bg-[#1b365d] text-white border-[#1b365d]' :
+                    sAns ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' :
+                    'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                  }">
+                  Q${sq.num}
+                  ${sFlg ? '<span class="text-amber-500">⚑</span>' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        ` : ''}
+
+        <div class="p-5 sm:p-7 flex-1">
+          <div class="flex items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-[#1b365d]">Question ${q.num}</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600">Section ${q.section}</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-[#1b365d] font-medium">${q.marks} Marks</span>
+            </div>
+            <span class="text-xs text-slate-500">${q.topic}</span>
+          </div>
+
+          <div class="text-[15px] leading-relaxed text-slate-800 mb-6" data-highlightable="true" data-hl-key="q_${q.num}">
+            ${stemHtml}
+          </div>
+
+          ${renderQuestionInput(q, ansMap[q.num], getExamStruck(exam.id))}
+        </div>
+      </section>
+    </main>
+
+    <!-- BOTTOM ACCA CBE NAVIGATION BAR -->
+    <footer class="cbe-footer text-white px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 shrink-0 select-none">
+      <div class="flex items-center gap-2">
+        <button type="button" data-action="toggle-navigator"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-semibold transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span>Navigator</span>
+        </button>
+        <button type="button" data-action="open-review-screen"
+          class="px-3.5 py-1.5 rounded bg-[#d31245] hover:bg-[#a80d36] text-white text-xs sm:text-sm font-semibold transition">
+          End Exam
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button type="button" data-action="prev-q" ${state.currentQIndex === 0 ? 'disabled' : ''}
+          class="px-3.5 sm:px-4 py-1.5 rounded bg-white/15 hover:bg-white/25 disabled:opacity-40 disabled:cursor-not-allowed border border-white/25 text-xs sm:text-sm font-semibold transition">
+          ← Previous
+        </button>
+        ${state.currentQIndex < exam.questions.length - 1 ? `
+          <button type="button" data-action="next-q"
+            class="px-4 sm:px-5 py-1.5 rounded bg-white text-[#1b365d] hover:bg-slate-100 text-xs sm:text-sm font-bold transition shadow-sm">
+            Next →
+          </button>
+        ` : `
+          <button type="button" data-action="open-review-screen"
+            class="px-4 sm:px-5 py-1.5 rounded bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition shadow-sm">
+            Review &amp; Finish →
+          </button>
+        `}
+      </div>
+    </footer>
+
+    ${state.showCalc ? renderCalculatorModal() : ''}
+    ${state.showScratch ? renderScratchpadModal() : ''}
+    ${state.showNavigator ? renderNavigatorModal() : ''}
+    ${state.showHelpModal ? renderHelpModal() : ''}
+    <div id="cbe-toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg ${state.toastMsg ? '' : 'hidden'}">${state.toastMsg}</div>
+    </div>
+  `;
+}
+
+function renderQuestionInput(q, currentAns, struckMap) {
+  if (q.type === 'mcq') {
+    return `
+      <div class="space-y-2.5">
+        ${q.options.map(opt => {
+          const isSelected = currentAns === opt.key;
+          const isStruck = !!struckMap[`${q.num}_${opt.key}`];
+          return `
+            <div data-action="select-mcq" data-qnum="${q.num}" data-key="${opt.key}"
+              class="cbe-option-row ${isSelected ? 'selected' : ''} ${isStruck ? 'struck' : ''}">
+              <input type="radio" name="q_${q.num}" value="${opt.key}" ${isSelected ? 'checked' : ''} class="mt-1 w-4 h-4 accent-[#1b365d] pointer-events-none shrink-0" />
+              <div class="opt-text text-[14.5px] leading-snug text-slate-800">
+                <strong class="mr-1.5 text-[#1b365d]">${opt.key}.</strong>${opt.text}
+              </div>
+            </div>
+          `;
+        }).join('')}
+        <p class="text-[11px] text-slate-400 pt-1">Tip: Right-click any option (or enable Strikethrough) to cross out eliminated answers.</p>
+      </div>
+    `;
+  }
+
+  if (q.type === 'multi') {
+    const selectedArr = Array.isArray(currentAns) ? currentAns : [];
+    return `
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between text-xs mb-1">
+          <span class="font-semibold text-[#1b365d]">Select exactly ${q.selectCount} options</span>
+          <span class="px-2 py-0.5 rounded ${selectedArr.length === q.selectCount ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} font-semibold">
+            Selected: ${selectedArr.length} / ${q.selectCount}
+          </span>
+        </div>
+        ${state.multiNotice ? `<div class="text-xs px-3 py-1.5 rounded bg-amber-50 border border-amber-300 text-amber-900 font-medium">${state.multiNotice}</div>` : ''}
+        ${q.options.map(opt => {
+          const isSelected = selectedArr.includes(opt.key);
+          const isStruck = !!struckMap[`${q.num}_${opt.key}`];
+          return `
+            <div data-action="toggle-multi" data-qnum="${q.num}" data-key="${opt.key}" data-limit="${q.selectCount}"
+              class="cbe-option-row ${isSelected ? 'selected' : ''} ${isStruck ? 'struck' : ''}">
+              <input type="checkbox" ${isSelected ? 'checked' : ''} class="mt-1 w-4 h-4 accent-[#1b365d] pointer-events-none shrink-0" />
+              <div class="opt-text text-[14.5px] leading-snug text-slate-800">
+                <strong class="mr-1.5 text-[#1b365d]">${opt.key}.</strong>${opt.text}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  if (q.type === 'number') {
+    const val = typeof currentAns === 'string' ? currentAns : '';
+    return `
+      <div class="bg-slate-50 border border-slate-300 rounded-lg p-5 max-w-md">
+        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600 mb-2">Enter your numerical answer</label>
+        <div class="flex items-center gap-2">
+          ${q.prefix ? `<span class="text-base font-bold text-slate-700">${q.prefix}</span>` : ''}
+          <input type="text" inputmode="decimal" id="num-answer-input" data-qnum="${q.num}" value="${val.replace(/"/g, '&quot;')}"
+            placeholder="Type figure..."
+            class="flex-1 bg-white border-2 border-[#1b365d] rounded px-3 py-2 text-base font-mono-num font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          ${q.suffix ? `<span class="text-sm font-semibold text-slate-700">${q.suffix}</span>` : ''}
+        </div>
+        <div id="num-preview-val" class="text-xs font-semibold text-[#1b365d] mt-2 h-4">${val.trim() ? `Preview: ${q.prefix || ''}${val.trim()}${q.suffix ? ' ' + q.suffix : ''}` : ''}</div>
+        <p class="text-[11px] text-slate-500 mt-1">Enter digits without currency signs (commas are accepted). Pay attention to any unit shown on the right.</p>
+      </div>
+    `;
+  }
+
+  if (q.type === 'tf_matrix') {
+    const valObj = (currentAns && typeof currentAns === 'object') ? currentAns : {};
+    return `
+      <div class="overflow-x-auto">
+        <table class="cbe-table">
+          <thead>
+            <tr>
+              <th>Statement</th>
+              <th class="text-center w-24">True</th>
+              <th class="text-center w-24">False</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${q.rows.map(row => `
+              <tr>
+                <td class="text-slate-800">${row.text}</td>
+                <td class="text-center">
+                  <label class="inline-flex items-center justify-center w-full py-1 cursor-pointer">
+                    <input type="radio" name="tf_${q.num}_${row.id}" data-action="select-tf" data-qnum="${q.num}" data-rowid="${row.id}" value="True" ${valObj[row.id] === 'True' ? 'checked' : ''} class="w-4 h-4 accent-[#1b365d]" />
+                  </label>
+                </td>
+                <td class="text-center">
+                  <label class="inline-flex items-center justify-center w-full py-1 cursor-pointer">
+                    <input type="radio" name="tf_${q.num}_${row.id}" data-action="select-tf" data-qnum="${q.num}" data-rowid="${row.id}" value="False" ${valObj[row.id] === 'False' ? 'checked' : ''} class="w-4 h-4 accent-[#1b365d]" />
+                  </label>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  if (q.type === 'dropdown_table') {
+    const valObj = (currentAns && typeof currentAns === 'object') ? currentAns : {};
+    return `
+      <div class="overflow-x-auto max-w-xl">
+        <table class="cbe-table">
+          <thead>
+            <tr>
+              <th>${q.headers[0]}</th>
+              <th class="w-56">${q.headers[1]}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${q.rows.map(row => `
+              <tr>
+                <td class="font-medium text-slate-800">${row.label}</td>
+                <td>
+                  <select data-action="select-dropdown" data-qnum="${q.num}" data-rowid="${row.id}"
+                    class="w-full bg-white border border-slate-400 rounded px-2.5 py-1.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#1b365d] focus:ring-1 focus:ring-[#1b365d]">
+                    <option value="">-- Select --</option>
+                    ${row.options.map(opt => `<option value="${opt}" ${valObj[row.id] === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                  </select>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  return '';
+}
+
+function renderCalculatorModal() {
+  const keys = [
+    { l: 'C', v: 'C', cls: 'clr' }, { l: 'CE', v: 'CE', cls: 'clr' }, { l: '⌫', v: 'BACK', cls: 'op' }, { l: '÷', v: '/', cls: 'op' },
+    { l: '7', v: '7', cls: '' }, { l: '8', v: '8', cls: '' }, { l: '9', v: '9', cls: '' }, { l: '×', v: '*', cls: 'op' },
+    { l: '4', v: '4', cls: '' }, { l: '5', v: '5', cls: '' }, { l: '6', v: '6', cls: '' }, { l: '−', v: '-', cls: 'op' },
+    { l: '1', v: '1', cls: '' }, { l: '2', v: '2', cls: '' }, { l: '3', v: '3', cls: '' }, { l: '+', v: '+', cls: 'op' },
+    { l: '±', v: 'SIGN', cls: 'op' }, { l: '0', v: '0', cls: '' }, { l: '.', v: '.', cls: '' }, { l: '=', v: '=', cls: 'eq' },
+    { l: '√', v: 'SQRT', cls: 'op col-span-2' }, { l: '%', v: '%', cls: 'op col-span-2' }
+  ];
+  const posStyle = state.calcPos.left !== null
+    ? `left:${state.calcPos.left}px; top:${state.calcPos.top}px;`
+    : `right:16px; top:${state.calcPos.top}px;`;
+  return `
+    <div id="calc-window" class="floating-window w-72 overflow-hidden" style="${posStyle}">
+      <div data-drag-target="calc" class="drag-handle bg-[#1b365d] text-white px-3.5 py-2 flex items-center justify-between text-xs font-semibold">
+        <span>ACCA CBE Calculator</span>
+        <div class="flex items-center gap-2">
+          <button type="button" data-action="copy-calc" class="text-[11px] bg-white/15 hover:bg-white/25 px-1.5 py-0.5 rounded text-slate-100">Copy</button>
+          <button type="button" data-action="toggle-calc" class="text-slate-300 hover:text-white text-base leading-none">&times;</button>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-100">
+        <div class="bg-white border border-slate-300 rounded px-3 py-2 text-right mb-2.5">
+          <div id="calc-expr" class="text-[11px] text-slate-400 font-mono-num h-4 truncate">${state.calcExpr || '&nbsp;'}</div>
+          <div id="calc-display" class="text-xl font-bold font-mono-num text-slate-900 truncate">${state.calcDisplay}</div>
+        </div>
+        <div class="grid grid-cols-4 gap-1.5">
+          ${keys.map(k => `<button type="button" data-action="calc-key" data-val="${k.v}" class="calc-btn ${k.cls}">${k.l}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderScratchpadModal() {
+  const txt = state.scratchpad[state.activeExamId] || '';
+  const posStyle = `left:${state.scratchPos.left}px; top:${state.scratchPos.top}px;`;
+  return `
+    <div id="scratch-window" class="floating-window w-80 sm:w-96 overflow-hidden" style="${posStyle}">
+      <div data-drag-target="scratch" class="drag-handle bg-[#1b365d] text-white px-3.5 py-2 flex items-center justify-between text-xs font-semibold">
+        <span>Scratch Pad (Workings)</span>
+        <div class="flex items-center gap-2">
+          <button type="button" data-action="clear-scratch" class="text-[11px] text-slate-300 hover:text-white underline">Clear</button>
+          <button type="button" data-action="toggle-scratch" class="text-slate-300 hover:text-white text-base leading-none">&times;</button>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-50">
+        <textarea id="scratchpad-area" rows="10" placeholder="Write rough workings here (e.g. Lease liability table, WANOS, Deferred Tax movement)..."
+          class="w-full border border-slate-300 rounded p-2.5 text-xs font-mono-num text-slate-800 bg-white focus:outline-none focus:border-[#1b365d]">${txt.replace(/</g, '&lt;')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function renderNavigatorModal() {
+  const exam = getExam();
+  const ansMap = getExamAnswers(exam.id);
+  const flagMap = getExamFlags(exam.id);
+  const visMap = getExamVisited(exam.id);
+
+  const filtered = exam.questions.filter(q => {
+    const done = isQuestionAnswered(q, ansMap[q.num]);
+    const flg = !!flagMap[q.num];
+    if (state.navFilter === 'incomplete') return !done;
+    if (state.navFilter === 'flagged') return flg;
+    return true;
+  });
+
+  return `
+    <div class="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-300 rounded-lg shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+        <div class="bg-[#1b365d] text-white px-5 py-3 flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-sm sm:text-base">Navigator</h3>
+            <p class="text-[11px] text-slate-300">Click any question number to jump directly to it</p>
+          </div>
+          <button type="button" data-action="toggle-navigator" class="text-slate-300 hover:text-white text-xl leading-none">&times;</button>
+        </div>
+
+        <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5 flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-1.5 text-xs">
+            <button type="button" data-action="set-nav-filter" data-filter="all" class="px-2.5 py-1 rounded font-semibold ${state.navFilter === 'all' ? 'bg-[#1b365d] text-white' : 'bg-white border border-slate-300 text-slate-700'}">All (${exam.totalQuestions})</button>
+            <button type="button" data-action="set-nav-filter" data-filter="incomplete" class="px-2.5 py-1 rounded font-semibold ${state.navFilter === 'incomplete' ? 'bg-[#1b365d] text-white' : 'bg-white border border-slate-300 text-slate-700'}">Incomplete</button>
+            <button type="button" data-action="set-nav-filter" data-filter="flagged" class="px-2.5 py-1 rounded font-semibold ${state.navFilter === 'flagged' ? 'bg-[#1b365d] text-white' : 'bg-white border border-slate-300 text-slate-700'}">Flagged</button>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] text-slate-600">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Complete</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>Flagged</span>
+          </div>
+        </div>
+
+        <div class="p-4 overflow-y-auto cbe-scroll flex-1">
+          ${filtered.length === 0 ? `<p class="text-center text-sm text-slate-500 py-8">No questions match this filter.</p>` : `
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              ${filtered.map(q => {
+                const idx = exam.questions.findIndex(item => item.num === q.num);
+                const done = isQuestionAnswered(q, ansMap[q.num]);
+                const partial = isQuestionPartial(q, ansMap[q.num]);
+                const flg = !!flagMap[q.num];
+                const seen = !!visMap[q.num];
+                const isCur = idx === state.currentQIndex;
+                return `
+                  <button type="button" data-action="goto-q" data-index="${idx}"
+                    class="flex items-center justify-between px-3 py-2 rounded border text-left text-xs transition ${
+                      isCur ? 'border-[#1b365d] bg-blue-50 ring-1 ring-[#1b365d]' :
+                      done ? 'border-emerald-200 bg-emerald-50/60 hover:bg-emerald-50' :
+                      'border-slate-200 bg-white hover:bg-slate-50'
+                    }">
+                    <div>
+                      <div class="font-bold text-slate-900">Question ${q.num}</div>
+                      <div class="text-[11px] ${done ? 'text-emerald-700' : partial ? 'text-amber-700' : 'text-slate-500'}">
+                        ${done ? 'Complete' : partial ? 'Partial' : seen ? 'Incomplete' : 'Unseen'}
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      ${flg ? '<span class="text-amber-500 text-sm" title="Flagged">⚑</span>' : ''}
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">Sec ${q.section}</span>
+                    </div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+
+        <div class="bg-slate-100 border-t border-slate-200 px-5 py-3 flex justify-between items-center">
+          <button type="button" data-action="open-review-screen" class="text-xs font-semibold text-[#d31245] hover:underline">Go to Item Review Screen</button>
+          <button type="button" data-action="toggle-navigator" class="px-4 py-1.5 rounded bg-[#1b365d] text-white text-xs font-semibold">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderHelpModal() {
+  return `
+    <div class="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-300 rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
+        <div class="bg-[#1b365d] text-white px-5 py-3 flex items-center justify-between">
+          <h3 class="font-bold text-sm">ACCA CBE Exam Help</h3>
+          <button type="button" data-action="toggle-help" class="text-slate-300 hover:text-white text-xl leading-none">&times;</button>
+        </div>
+        <div class="p-5 text-xs sm:text-sm text-slate-700 space-y-2.5">
+          <p><strong>Highlight:</strong> Click <em>Highlight</em>, then drag across any text in the scenario or question stem to highlight key figures in yellow.</p>
+          <p><strong>Strikethrough:</strong> Enable <em>Strikethrough</em> (or right-click any MCQ option) to cross out eliminated answers.</p>
+          <p><strong>Flag for Review:</strong> Mark tricky questions to revisit them quickly via the <em>Navigator</em> or <em>Item Review</em> screen.</p>
+          <p><strong>Timer:</strong> Click the timer in the top-right to hide or show it at any time. At 15 mins remaining it turns amber; at 5 mins it flashes red.</p>
+        </div>
+        <div class="bg-slate-100 px-5 py-3 text-right">
+          <button type="button" data-action="toggle-help" class="px-4 py-1.5 rounded bg-[#1b365d] text-white text-xs font-semibold">Got it</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderReviewScreen() {
+  const exam = getExam();
+  const ansMap = getExamAnswers(exam.id);
+  const flagMap = getExamFlags(exam.id);
+  const completeCount = exam.questions.filter(q => isQuestionAnswered(q, ansMap[q.num])).length;
+  const incompleteCount = exam.totalQuestions - completeCount;
+  const flaggedCount = Object.values(flagMap).filter(Boolean).length;
+  const mode = state.timerMode[exam.id] || 'acca';
+
+  return `
+    <header class="cbe-header text-white px-4 sm:px-6 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="px-2 py-0.5 rounded bg-[#d31245] font-bold text-xs">ACCA</span>
+        <span class="font-semibold text-sm">${exam.title} — Item Review</span>
+      </div>
+      <div id="cbe-timer-pill" class="flex items-center gap-2 px-3 py-1 rounded text-xs sm:text-sm font-mono-num bg-slate-900/50 text-white border border-slate-500/50">
+        <span id="cbe-timer-val">${mode === 'untimed' ? formatTime(state.elapsedSec) : formatTime(state.timeRemainingSec)}</span>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6">
+      <div class="bg-white border border-slate-300 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-[#eef2f6] border-b border-slate-300 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Item Review Screen</h2>
+            <p class="text-xs text-slate-600 mt-0.5">Review your question statuses before submitting your exam for marking.</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-semibold">
+            <span class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800">Complete: ${completeCount}</span>
+            <span class="px-2.5 py-1 rounded bg-rose-100 text-rose-800">Incomplete: ${incompleteCount}</span>
+            <span class="px-2.5 py-1 rounded bg-amber-100 text-amber-800">Flagged: ${flaggedCount}</span>
+          </div>
+        </div>
+
+        <div class="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+          ${exam.questions.map((q, idx) => {
+            const done = isQuestionAnswered(q, ansMap[q.num]);
+            const flg = !!flagMap[q.num];
+            return `
+              <button type="button" data-action="goto-q" data-index="${idx}"
+                class="p-2.5 rounded border text-left transition ${done ? 'border-emerald-300 bg-emerald-50/70 hover:bg-emerald-100' : 'border-rose-200 bg-rose-50/50 hover:bg-rose-100'}">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-slate-900">Q${q.num}</span>
+                  ${flg ? '<span class="text-amber-600 text-xs">⚑</span>' : ''}
+                </div>
+                <div class="text-[11px] mt-0.5 ${done ? 'text-emerald-700' : 'text-rose-700'} font-medium">${done ? 'Complete' : 'Incomplete'}</div>
+                <div class="text-[10px] text-slate-500">Section ${q.section}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="bg-[#eef2f6] border-t border-slate-300 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" data-action="back-to-exam"
+              class="px-4 py-2 rounded border border-slate-300 bg-white text-slate-800 hover:bg-slate-100 text-sm font-semibold">
+              ← Return to Exam
+            </button>
+            ${incompleteCount > 0 ? `
+              <button type="button" data-action="jump-first-incomplete"
+                class="px-3.5 py-2 rounded border border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs font-semibold">
+                Review Incomplete (${incompleteCount})
+              </button>
+            ` : ''}
+            ${flaggedCount > 0 ? `
+              <button type="button" data-action="jump-first-flagged"
+                class="px-3.5 py-2 rounded border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-semibold">
+                Review Flagged (${flaggedCount})
+              </button>
+            ` : ''}
+          </div>
+          <button type="button" data-action="confirm-submit"
+            class="px-6 py-2.5 rounded bg-[#d31245] hover:bg-[#a80d36] text-white text-sm font-bold shadow-sm">
+            End Exam &amp; Submit for Marking
+          </button>
+        </div>
+      </div>
+    </main>
+
+    ${state.showSubmitModal ? `
+      <div class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-md w-full overflow-hidden">
+          <div class="bg-[#1b365d] text-white px-5 py-3 font-bold text-sm">Confirm End Exam</div>
+          <div class="p-5 text-sm text-slate-700 space-y-2">
+            <p>You have answered <strong>${completeCount} of ${exam.totalQuestions}</strong> questions.</p>
+            ${incompleteCount > 0 ? `<p class="text-rose-700 font-medium">Warning: ${incompleteCount} question(s) are still incomplete and will receive 0 marks.</p>` : ''}
+            <p>Are you sure you want to finish and view your results and IFRS/IAS worked solutions?</p>
+          </div>
+          <div class="bg-slate-100 px-5 py-3 flex justify-end gap-2">
+            <button type="button" data-action="cancel-submit" class="px-4 py-1.5 rounded border border-slate-300 bg-white text-slate-700 text-xs font-semibold">Cancel</button>
+            <button type="button" data-action="final-submit" class="px-5 py-1.5 rounded bg-[#d31245] text-white text-xs font-bold">Yes, End Exam</button>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function formatUserAnswer(q, ans) {
+  if (!isQuestionAnswered(q, ans)) return '<span class="italic text-slate-400">Not answered</span>';
+  if (q.type === 'mcq') {
+    const opt = q.options.find(o => o.key === ans);
+    return `<strong>${ans}.</strong> ${opt ? opt.text : ans}`;
+  }
+  if (q.type === 'multi') {
+    return ans.map(k => {
+      const opt = q.options.find(o => o.key === k);
+      return `<div><strong>${k}.</strong> ${opt ? opt.text : k}</div>`;
+    }).join('');
+  }
+  if (q.type === 'number') return `${q.prefix || ''}${ans} ${q.suffix || ''}`;
+  if (q.type === 'tf_matrix' || q.type === 'dropdown_table') {
+    return q.rows.map(r => `<div>${r.label || r.text}: <strong>${ans[r.id] || '—'}</strong></div>`).join('');
+  }
+  return String(ans);
+}
+
+function formatCorrectAnswer(q) {
+  if (q.type === 'mcq') {
+    const opt = q.options.find(o => o.key === q.correct);
+    return `<strong>${q.correct}.</strong> ${opt ? opt.text : q.correct}`;
+  }
+  if (q.type === 'multi') {
+    return q.correct.map(k => {
+      const opt = q.options.find(o => o.key === k);
+      return `<div><strong>${k}.</strong> ${opt ? opt.text : k}</div>`;
+    }).join('');
+  }
+  if (q.type === 'number') return `<strong>${q.displayCorrect}</strong>`;
+  if (q.type === 'tf_matrix' || q.type === 'dropdown_table') {
+    return q.rows.map(r => `<div>${r.label || r.text}: <strong>${r.correct}</strong></div>`).join('');
+  }
+  return '';
+}
+
+function renderResults() {
+  const exam = getExam();
+  const ansMap = getExamAnswers(exam.id);
+  const flagMap = getExamFlags(exam.id);
+  const hist = state.history[exam.id] || { score: 0, total: exam.totalMarks, correctCount: 0, pct: 0, timeTakenSec: 0 };
+
+  // Section breakdown
+  const secStats = exam.sections.map(sec => {
+    const qs = exam.questions.filter(q => q.section === sec.id);
+    const right = qs.filter(q => isAnswerCorrect(q, ansMap[q.num])).length;
+    return { name: sec.id === 'A' ? 'Section A' : 'Section B', marks: right * 2, max: qs.length * 2, pct: Math.round((right / qs.length) * 100) };
+  });
+
+  // Topic breakdown
+  const topicMap = {};
+  exam.questions.forEach(q => {
+    if (!topicMap[q.topic]) topicMap[q.topic] = { right: 0, total: 0 };
+    topicMap[q.topic].total += 1;
+    if (isAnswerCorrect(q, ansMap[q.num])) topicMap[q.topic].right += 1;
+  });
+
+  const filteredQs = exam.questions.filter(q => {
+    const ok = isAnswerCorrect(q, ansMap[q.num]);
+    if (state.resultsFilter === 'incorrect') return !ok;
+    if (state.resultsFilter === 'correct') return ok;
+    if (state.resultsFilter === 'flagged') return !!flagMap[q.num];
+    return true;
+  });
+
+  const passed = hist.pct >= 50;
+
+  return `
+    <header class="cbe-header text-white px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="px-2 py-0.5 rounded bg-[#d31245] font-bold text-xs">ACCA</span>
+        <span class="font-semibold text-sm sm:text-base">${exam.title} — Results &amp; Worked Solutions</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" data-action="start-exam-fresh" data-exam="${exam.id}" class="px-3 py-1.5 rounded bg-white/15 hover:bg-white/25 text-xs font-semibold">Retake Exam</button>
+        <button type="button" data-action="go-home" class="px-3 py-1.5 rounded bg-white text-[#1b365d] text-xs font-bold">All Exams</button>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+      ${hist.autoTimeout ? `
+        <div class="bg-amber-50 border border-amber-300 text-amber-900 rounded-lg px-4 py-3 text-sm font-medium">
+          Time expired — your exam was automatically submitted according to ACCA CBE rules.
+        </div>
+      ` : ''}
+
+      <!-- SCORECARD -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white border-2 ${passed ? 'border-emerald-500' : 'border-rose-500'} rounded-lg p-5 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-slate-500">Final Score</span>
+            <span class="px-2 py-0.5 rounded text-xs font-bold text-white ${passed ? 'bg-emerald-600' : 'bg-rose-600'}">${passed ? 'PASS' : 'FAIL'}</span>
+          </div>
+          <div class="mt-2">
+            <span class="text-3xl font-bold font-mono-num text-slate-900">${hist.score}</span>
+            <span class="text-base text-slate-500 font-mono-num"> / ${hist.total}</span>
+            <span class="ml-2 text-lg font-bold ${passed ? 'text-emerald-700' : 'text-rose-700'}">(${hist.pct}%)</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">${hist.correctCount} of ${exam.totalQuestions} questions correct</div>
+        </div>
+
+        ${secStats.map(s => `
+          <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+            <div class="text-xs font-bold uppercase text-slate-500">${s.name}</div>
+            <div class="text-2xl font-bold font-mono-num text-[#1b365d] mt-2">${s.marks} / ${s.max}</div>
+            <div class="w-full bg-slate-200 h-2 rounded-full mt-2 overflow-hidden">
+              <div class="h-full ${s.pct >= 50 ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${s.pct}%"></div>
+            </div>
+            <div class="text-xs text-slate-500 mt-1">${s.pct}% accuracy</div>
+          </div>
+        `).join('')}
+
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+          <div class="text-xs font-bold uppercase text-slate-500">Time Taken</div>
+          <div class="text-2xl font-bold font-mono-num text-slate-900 mt-2">${formatTime(hist.timeTakenSec)}</div>
+          <div class="text-xs text-slate-500 mt-2">Avg: ${Math.round(hist.timeTakenSec / exam.totalQuestions)}s / question</div>
+        </div>
+      </div>
+
+      <!-- TOPIC PERFORMANCE -->
+      <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3">IFRS / IAS Topic Performance</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          ${Object.entries(topicMap).map(([topic, d]) => {
+            const tp = Math.round((d.right / d.total) * 100);
+            return `
+              <div class="border border-slate-200 rounded px-3 py-2 flex items-center justify-between text-xs bg-slate-50">
+                <span class="font-medium text-slate-800 truncate pr-2">${topic}</span>
+                <span class="font-mono-num font-bold shrink-0 ${tp >= 50 ? 'text-emerald-700' : 'text-rose-700'}">${d.right}/${d.total} (${tp}%)</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- QUESTION-BY-QUESTION REVIEW -->
+      <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-[#eef2f6] border-b border-slate-300 px-5 py-3 flex flex-wrap items-center justify-between gap-2">
+          <h3 class="font-bold text-slate-900 text-sm sm:text-base">Detailed Question Review &amp; Workings</h3>
+          <div class="flex items-center gap-1.5 text-xs">
+            <button type="button" data-action="set-results-filter" data-filter="all" class="px-2.5 py-1 rounded font-semibold ${state.resultsFilter === 'all' ? 'bg-[#1b365d] text-white' : 'bg-white border border-slate-300 text-slate-700'}">All (${exam.totalQuestions})</button>
+            <button type="button" data-action="set-results-filter" data-filter="incorrect" class="px-2.5 py-1 rounded font-semibold ${state.resultsFilter === 'incorrect' ? 'bg-rose-600 text-white' : 'bg-white border border-slate-300 text-slate-700'}">Incorrect (${exam.totalQuestions - hist.correctCount})</button>
+            <button type="button" data-action="set-results-filter" data-filter="correct" class="px-2.5 py-1 rounded font-semibold ${state.resultsFilter === 'correct' ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-700'}">Correct (${hist.correctCount})</button>
+            <button type="button" data-action="set-results-filter" data-filter="flagged" class="px-2.5 py-1 rounded font-semibold ${state.resultsFilter === 'flagged' ? 'bg-amber-600 text-white' : 'bg-white border border-slate-300 text-slate-700'}">Flagged</button>
+          </div>
+        </div>
+
+        <div class="divide-y divide-slate-200">
+          ${filteredQs.length === 0 ? `<p class="p-8 text-center text-sm text-slate-500">No questions match this filter.</p>` : filteredQs.map(q => {
+            const ok = isAnswerCorrect(q, ansMap[q.num]);
+            const sc = q.scenarioId ? exam.scenarios[q.scenarioId] : null;
+            return `
+              <div class="p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-sm text-[#1b365d]">Question ${q.num}</span>
+                    <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600">${q.topic}</span>
+                    ${sc ? `<span class="text-xs px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 font-medium">${sc.title}</span>` : ''}
+                    ${flagMap[q.num] ? '<span class="text-xs text-amber-600 font-semibold">⚑ Flagged</span>' : ''}
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded text-xs font-bold ${ok ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                    ${ok ? '✓ Correct (2/2)' : '✕ Incorrect (0/2)'}
+                  </span>
+                </div>
+
+                <div class="text-sm text-slate-800 mb-3">${q.stem}</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mb-3">
+                  <div class="p-3 rounded border ${ok ? 'bg-emerald-50/70 border-emerald-200' : 'bg-rose-50/70 border-rose-200'}">
+                    <div class="font-bold uppercase text-[11px] mb-1 ${ok ? 'text-emerald-800' : 'text-rose-800'}">Your Answer</div>
+                    <div class="text-slate-800">${formatUserAnswer(q, ansMap[q.num])}</div>
+                  </div>
+                  <div class="p-3 rounded border bg-blue-50/70 border-blue-200">
+                    <div class="font-bold uppercase text-[11px] text-[#1b365d] mb-1">Correct Answer</div>
+                    <div class="text-slate-900">${formatCorrectAnswer(q)}</div>
+                  </div>
+                </div>
+
+                <div class="bg-slate-50 border-l-4 border-[#1b365d] px-3.5 py-2.5 text-xs sm:text-[13px] text-slate-700 leading-relaxed">
+                  <div class="font-bold text-[#1b365d] mb-1">ACCA Examiner Working &amp; Explanation</div>
+                  ${q.explanation}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </main>
+  `;
+}
+
+// ============================================================================
+// EVENT LISTENERS (DELEGATED & CLEAN)
+// ============================================================================
+function attachEventListeners() {
+  const root = document.getElementById('app');
+
+  // Number input live binding
+  const numInput = document.getElementById('num-answer-input');
+  if (numInput) {
+    numInput.addEventListener('input', (e) => {
+      const qnum = Number(e.target.getAttribute('data-qnum'));
+      const exam = getExam();
+      const q = exam ? exam.questions.find(item => item.num === qnum) : null;
+      getExamAnswers()[qnum] = e.target.value;
+      saveState();
+      updateAnsweredCountDOM();
+      if (q) updateNumPreviewDOM(q, e.target.value);
+    });
+  }
+
+  // Click-to-unhighlight individual yellow highlight when Highlight mode is active
+  if (state.highlightMode) {
+    root.querySelectorAll('.cbe-highlight').forEach(span => {
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const host = span.closest('[data-highlightable="true"]');
+        const parent = span.parentNode;
+        while (span.firstChild) parent.insertBefore(span.firstChild, span);
+        parent.removeChild(span);
+        if (host) {
+          const key = host.getAttribute('data-hl-key');
+          if (!state.highlights[state.activeExamId]) state.highlights[state.activeExamId] = {};
+          state.highlights[state.activeExamId][key] = host.innerHTML;
+        }
+      });
+    });
+  }
+
+  // Draggable floating windows (Calculator & Scratch Pad)
+  root.querySelectorAll('[data-drag-target]').forEach(handle => {
+    handle.addEventListener('mousedown', (e) => {
+      if (e.target.closest('button')) return;
+      const which = handle.getAttribute('data-drag-target');
+      const win = handle.closest('.floating-window');
+      if (!win) return;
+      const rect = win.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+      function onMove(ev) {
+        const nx = Math.max(4, Math.min(window.innerWidth - rect.width - 4, ev.clientX - offsetX));
+        const ny = Math.max(4, Math.min(window.innerHeight - 48, ev.clientY - offsetY));
+        win.style.left = nx + 'px';
+        win.style.right = 'auto';
+        win.style.top = ny + 'px';
+        if (which === 'calc') state.calcPos = { left: nx, top: ny };
+        else state.scratchPos = { left: nx, top: ny };
+      }
+      function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+      }
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    });
+  });
+
+  // Scratchpad live binding
+  const scratchArea = document.getElementById('scratchpad-area');
+  if (scratchArea) {
+    scratchArea.addEventListener('input', (e) => {
+      state.scratchpad[state.activeExamId] = e.target.value;
+      saveState();
+    });
+  }
+
+  // Dropdown select bindings
+  root.querySelectorAll('select[data-action="select-dropdown"]').forEach(sel => {
+    sel.addEventListener('change', (e) => {
+      const qnum = Number(e.target.getAttribute('data-qnum'));
+      const rowid = e.target.getAttribute('data-rowid');
+      const ansMap = getExamAnswers();
+      if (!ansMap[qnum] || typeof ansMap[qnum] !== 'object') ansMap[qnum] = {};
+      ansMap[qnum][rowid] = e.target.value;
+      saveState();
+      render();
+    });
+  });
+
+  // TF matrix radio bindings
+  root.querySelectorAll('input[data-action="select-tf"]').forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const qnum = Number(e.target.getAttribute('data-qnum'));
+      const rowid = e.target.getAttribute('data-rowid');
+      const ansMap = getExamAnswers();
+      if (!ansMap[qnum] || typeof ansMap[qnum] !== 'object') ansMap[qnum] = {};
+      ansMap[qnum][rowid] = e.target.value;
+      saveState();
+      render();
+    });
+  });
+
+  // Highlight mouseup
+  root.querySelectorAll('[data-highlightable="true"]').forEach(el => {
+    el.addEventListener('mouseup', applyHighlightSelection);
+  });
+
+  // Right-click strikethrough on MCQ/Multi options
+  root.querySelectorAll('.cbe-option-row').forEach(row => {
+    row.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const qnum = row.getAttribute('data-qnum');
+      const key = row.getAttribute('data-key');
+      const struck = getExamStruck();
+      const sk = `${qnum}_${key}`;
+      struck[sk] = !struck[sk];
+      saveState();
+      render();
+    });
+  });
+}
+
+// Global click delegation on #app
+document.getElementById('app').addEventListener('click', (e) => {
+  const target = e.target.closest('[data-action]');
+  if (!target) return;
+  const action = target.getAttribute('data-action');
+
+  if (action === 'set-timer-mode') {
+    const examId = target.getAttribute('data-exam');
+    const mode = target.getAttribute('data-mode');
+    state.timerMode[examId] = mode;
+    saveState();
+    render();
+  } else if (action === 'open-instructions') {
+    openInstructions(target.getAttribute('data-exam'));
+  } else if (action === 'fresh-start') {
+    const examId = target.getAttribute('data-exam');
+    state.answers[examId] = {};
+    state.flags[examId] = {};
+    state.visited[examId] = {};
+    state.struck[examId] = {};
+    delete state.history[examId];
+    delete state.savedTimers[examId];
+    saveState();
+    render();
+  } else if (action === 'view-last-results') {
+    state.activeExamId = target.getAttribute('data-exam');
+    state.resultsFilter = 'all';
+    state.view = 'results';
+    render();
+  } else if (action === 'go-home') {
+    stopTimer();
+    state.view = 'home';
+    render();
+  } else if (action === 'start-exam-fresh') {
+    launchExam(target.getAttribute('data-exam'), true);
+  } else if (action === 'start-exam-resume') {
+    launchExam(target.getAttribute('data-exam'), false);
+  } else if (action === 'select-mcq') {
+    const qnum = Number(target.getAttribute('data-qnum'));
+    const key = target.getAttribute('data-key');
+    if (state.strikeMode) {
+      const struck = getExamStruck();
+      struck[`${qnum}_${key}`] = !struck[`${qnum}_${key}`];
+    } else {
+      getExamAnswers()[qnum] = key;
+    }
+    saveState();
+    render();
+  } else if (action === 'toggle-multi') {
+    const qnum = Number(target.getAttribute('data-qnum'));
+    const key = target.getAttribute('data-key');
+    const limit = Number(target.getAttribute('data-limit'));
+    if (state.strikeMode) {
+      const struck = getExamStruck();
+      struck[`${qnum}_${key}`] = !struck[`${qnum}_${key}`];
+    } else {
+      const ansMap = getExamAnswers();
+      let arr = Array.isArray(ansMap[qnum]) ? [...ansMap[qnum]] : [];
+      if (arr.includes(key)) {
+        arr = arr.filter(k => k !== key);
+        state.multiNotice = '';
+      } else if (arr.length >= limit) {
+        state.multiNotice = `You have already selected ${limit} options. Deselect one option before choosing another.`;
+      } else {
+        arr.push(key);
+        state.multiNotice = '';
+      }
+      ansMap[qnum] = arr;
+    }
+    saveState();
+    render();
+  } else if (action === 'prev-q') {
+    goToQuestion(state.currentQIndex - 1);
+  } else if (action === 'next-q') {
+    goToQuestion(state.currentQIndex + 1);
+  } else if (action === 'goto-q') {
+    goToQuestion(Number(target.getAttribute('data-index')));
+  } else if (action === 'toggle-flag') {
+    const exam = getExam();
+    const q = exam.questions[state.currentQIndex];
+    const flagMap = getExamFlags();
+    flagMap[q.num] = !flagMap[q.num];
+    saveState();
+    render();
+  } else if (action === 'toggle-calc') {
+    state.showCalc = !state.showCalc;
+    render();
+  } else if (action === 'calc-key') {
+    calcPress(target.getAttribute('data-val'));
+  } else if (action === 'toggle-scratch') {
+    state.showScratch = !state.showScratch;
+    render();
+  } else if (action === 'clear-scratch') {
+    state.scratchpad[state.activeExamId] = '';
+    saveState();
+    render();
+  } else if (action === 'toggle-highlight') {
+    state.highlightMode = !state.highlightMode;
+    if (state.highlightMode) state.strikeMode = false;
+    render();
+  } else if (action === 'clear-highlights') {
+    clearCurrentHighlights();
+  } else if (action === 'toggle-strike') {
+    state.strikeMode = !state.strikeMode;
+    if (state.strikeMode) state.highlightMode = false;
+    render();
+  } else if (action === 'toggle-navigator') {
+    state.showNavigator = !state.showNavigator;
+    render();
+  } else if (action === 'set-nav-filter') {
+    state.navFilter = target.getAttribute('data-filter');
+    render();
+  } else if (action === 'toggle-help') {
+    state.showHelpModal = !state.showHelpModal;
+    render();
+  } else if (action === 'toggle-timer-visibility') {
+    state.timerHidden = !state.timerHidden;
+    updateTimerDOM();
+  } else if (action === 'toggle-pause') {
+    state.timerPaused = !state.timerPaused;
+    render();
+  } else if (action === 'open-review-screen') {
+    state.showNavigator = false;
+    state.showCalc = false;
+    state.showScratch = false;
+    state.view = 'review_screen';
+    render();
+  } else if (action === 'back-to-exam') {
+    state.view = 'exam';
+    render();
+  } else if (action === 'confirm-submit') {
+    state.showSubmitModal = true;
+    render();
+  } else if (action === 'cancel-submit') {
+    state.showSubmitModal = false;
+    render();
+  } else if (action === 'final-submit') {
+    submitExam(false);
+  } else if (action === 'set-results-filter') {
+    state.resultsFilter = target.getAttribute('data-filter');
+    render();
+  } else if (action === 'copy-calc') {
+    const val = state.calcDisplay;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(val).catch(() => {});
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = val;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (err) {}
+      document.body.removeChild(ta);
+    }
+    showToast(`Copied ${val} to clipboard`);
+  } else if (action === 'jump-first-incomplete') {
+    const exam = getExam();
+    const ansMap = getExamAnswers(exam.id);
+    const idx = exam.questions.findIndex(q => !isQuestionAnswered(q, ansMap[q.num]));
+    if (idx !== -1) goToQuestion(idx);
+  } else if (action === 'jump-first-flagged') {
+    const exam = getExam();
+    const flagMap = getExamFlags(exam.id);
+    const idx = exam.questions.findIndex(q => !!flagMap[q.num]);
+    if (idx !== -1) goToQuestion(idx);
+  }
+});
+
+// Keyboard shortcuts during exam (Alt+N / Alt+Right = Next, Alt+P / Alt+Left = Prev, Alt+F = Flag, Alt+C = Calc)
+document.addEventListener('keydown', (e) => {
+  if (state.view !== 'exam') return;
+  const tag = (e.target && e.target.tagName || '').toUpperCase();
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+  if (e.altKey && (e.key === 'n' || e.key === 'N' || e.key === 'ArrowRight')) {
+    e.preventDefault();
+    goToQuestion(state.currentQIndex + 1);
+  } else if (e.altKey && (e.key === 'p' || e.key === 'P' || e.key === 'ArrowLeft')) {
+    e.preventDefault();
+    goToQuestion(state.currentQIndex - 1);
+  } else if (e.altKey && (e.key === 'f' || e.key === 'F')) {
+    e.preventDefault();
+    const exam = getExam();
+    const q = exam.questions[state.currentQIndex];
+    const flagMap = getExamFlags();
+    flagMap[q.num] = !flagMap[q.num];
+    saveState();
+    render();
+  } else if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+    e.preventDefault();
+    state.showCalc = !state.showCalc;
+    render();
+  }
+});
+
+// Init
+loadState();
+render();
+</script>
+</body>
+</html>
