@@ -1326,6 +1326,101 @@ const EXAMS = [
         explanation: `Under <strong>IFRS 5.8</strong>, actively marketing the asset for sale at a price that is reasonable in relation to its current fair value (<strong>A</strong>) is a required indicator that a sale is highly probable.`
       }
     ]
+  },
+  // ==========================================================================
+  // EXAM 4: D26 WEEKLY EXAM 2
+  // ==========================================================================
+  {
+    id: 'exam4',
+    code: 'FR-D26-WE2',
+    title: 'Financial Reporting (FR) — D26 Weekly Exam 2',
+    subtitle: 'D26 Weekly Exam 2 • IAS 23, IAS 40, IAS 38, IAS 36 & IFRS 5 • 6 Questions',
+    totalQuestions: 6,
+    totalMarks: 12,
+    marksPerQuestion: 2,
+    accaMinutes: 22, // ACCA Standard: 12 marks × 1.8 min/mark = 21.6 → 22 mins
+    paperMinutes: 15, // Sprint option
+    sections: [
+      { id: 'A', name: 'Section A — Objective Test Questions', range: [1, 6], description: '6 individual questions (2 marks each = 12 marks)' }
+    ],
+    scenarios: {},
+    questions: [
+      {
+        num: 1, section: 'A', type: 'number', topic: 'IAS 23 Borrowing Costs', marks: 2,
+        stem: `<p class="mb-2">An entity uses funds from its general borrowings to build a new production facility. Details of the entity's borrowings are shown below:</p>
+          <ul class="list-disc pl-5 space-y-1 mb-3">
+            <li>$10 million 6% loan</li>
+            <li>$6 million 8% loan</li>
+          </ul>
+          <p class="mb-2">The entity used $12 million of these funds to construct the facility, which was under construction for the entire year.</p>
+          <p class="font-semibold text-slate-900">How much interest should be capitalised as part of the cost of the asset?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['810000'],
+        displayCorrect: '$810,000',
+        explanation: `• Annual interest on general borrowings: ($10m × 6% = $600,000) + ($6m × 8% = $480,000) = $1,080,000.<br>• Weighted average capitalisation rate = $1,080,000 ÷ $16,000,000 = <strong>6.75%</strong>.<br>• Interest capitalised (full year) = $12,000,000 × 6.75% = <strong>$810,000</strong>.`
+      },
+      {
+        num: 2, section: 'A', type: 'mcq', topic: 'IAS 40 Investment Property', marks: 2,
+        stem: `<p class="mb-3">An entity purchased a property on 1 January 20X1 for $10 million, incurring acquisition costs of $500,000. The property was leased out to an independent party under an operating lease. The entity measures investment properties using the fair value model under IAS 40. On 31 December 20X1, the fair value of the property was estimated to be $11.8 million.</p><p class="font-semibold text-slate-900">How should the property be accounted for in the financial statements for the year ended 31 December 20X1?</p>`,
+        options: [
+          { key: 'A', text: 'Recognized at $10.5 million with $1.3 million recognized in Other Comprehensive Income.' },
+          { key: 'B', text: 'Recognized at $11.8 million with a fair value gain of $1.3 million recognized in Profit or Loss.' },
+          { key: 'C', text: 'Recognized at $11.8 million with a fair value gain of $1.8 million recognized in Profit or Loss.' },
+          { key: 'D', text: 'Recognized at $10.0 million with depreciation charged over its useful life.' }
+        ],
+        correct: 'B',
+        explanation: `• Under <strong>IAS 40.20</strong>, initial cost includes directly attributable transaction costs: $10.0m + $0.5m = $10.5m.<br>• Under the fair value model (IAS 40.35), no depreciation is charged and the fair value gain ($11.8m − $10.5m = <strong>$1.3m</strong>) is recognised directly in <strong>profit or loss</strong>, with the property carried at <strong>$11.8m</strong>.`
+      },
+      {
+        num: 3, section: 'A', type: 'mcq', topic: 'IAS 38 Intangibles', marks: 2,
+        stem: `<p class="mb-3">Cowper plc has spent $20,000 researching new cleaning chemicals in the year ended 31 December 20X0. They have also spent $40,000 developing a new cleaning product which will not go into commercial production until next year. The development project meets the criteria laid down in IAS 38 <em>Intangible Assets</em>.</p><p class="font-semibold text-slate-900">How should these costs be treated in the financial statements of Cowper plc for the year ended 31 December 20X0?</p>`,
+        options: [
+          { key: 'A', text: '$60,000 should be capitalised as an intangible asset on the statement of financial position.' },
+          { key: 'B', text: '$40,000 should be capitalised as an intangible asset and should be amortised, $20,000 should be written off to the statement of profit or loss.' },
+          { key: 'C', text: '$40,000 should be capitalised as an intangible asset and should not be amortised, $20,000 should be written off to the statement of profit or loss.' },
+          { key: 'D', text: '$60,000 should be written off to the statement of profit or loss.' }
+        ],
+        correct: 'C',
+        explanation: `• Research expenditure ($20,000) must be expensed to profit or loss immediately (IAS 38.54).<br>• Qualifying development expenditure ($40,000) is capitalised (IAS 38.57), and <strong>not amortised</strong> until commercial production begins and the asset is available for use (IAS 38.97).`
+      },
+      {
+        num: 4, section: 'A', type: 'number', topic: 'IAS 38 Intangibles', marks: 2,
+        stem: `<p class="mb-3">During the year to 31 December 20X8 X Co incurred $200,000 of development costs for a new product. In addition, X Co spent $60,000 on 1 January 20X8 on machinery specifically used to help develop the new product and $40,000 on building the brand identity. Commercial production is expected to start during 20X9.</p>
+          <p class="mb-2">The machinery is expected to last 4 years with no residual value.</p>
+          <p class="font-semibold text-slate-900">What value should be included within Intangible Assets in respect of the above in X Co's Statement of Financial Position as at 31 December 20X8?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['215000'],
+        displayCorrect: '$215,000',
+        explanation: `• Qualifying development costs = $200,000.<br>• Under <strong>IAS 38.66</strong>, depreciation of PPE (machinery) used <em>specifically</em> to generate the intangible asset is a directly attributable cost capitalised into the intangible asset: $60,000 ÷ 4 years = <strong>+$15,000</strong> (the machinery's $45,000 carrying amount stays in PPE).<br>• Internally generated brand identity ($40,000) is expensed (IAS 38.63).<br>• Total Intangible Assets = $200,000 + $15,000 = <strong>$215,000</strong>.<br><span class="text-amber-800 font-medium">Accuracy Note:</span> Updated from $200,000 in the uploaded sheet to reflect official ACCA / IAS 38.66 treatment of depreciation on dedicated development machinery.`
+      },
+      {
+        num: 5, section: 'A', type: 'number', topic: 'IAS 36 Impairment', marks: 2,
+        stem: `<p class="mb-2">The following information relates to four assets held by a company:</p>
+          <table class="cbe-table">
+            <thead>
+              <tr><th>Details ($m)</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Carrying amount</td><td class="num">120</td><td class="num">30</td><td class="num">40</td><td class="num">70</td></tr>
+              <tr><td>Value in use</td><td class="num">80</td><td class="num">70</td><td class="num">80</td><td class="num">20</td></tr>
+              <tr><td>Fair value less costs to sell</td><td class="num">90</td><td class="num">40</td><td class="num">70</td><td class="num">30</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-3 font-semibold text-slate-900">What is the total impairment loss?</p>`,
+        prefix: '$', suffix: 'm',
+        accepted: ['70', '70m', '70.0', '70000000'],
+        displayCorrect: '$70m (enter 70)',
+        explanation: `Recoverable amount = higher of VIU and FVLCD:<br>• Asset A: CA $120m vs RA $90m → Impairment <strong>$30m</strong>.<br>• Asset B: CA $30m vs RA $70m → $0.<br>• Asset C: CA $40m vs RA $80m → $0.<br>• Asset D: CA $70m vs RA $30m → Impairment <strong>$40m</strong>.<br>• Total impairment loss = $30m + $40m = <strong>$70m</strong>. (Corrected the "$15" typo at the top of the uploaded sheet.)`
+      },
+      {
+        num: 6, section: 'A', type: 'number', topic: 'IFRS 5 Held for Sale', marks: 2,
+        stem: `<p class="mb-3">Halfway through the year an asset is identified as an asset held for sale after meeting the criteria according to IFRS 5 <em>Non-current Assets Held for Sale and Discontinued Operations</em>. At the start of the year the carrying amount of the asset was $150,000 (original cost $200,000 two years ago). The asset is being depreciated on a straight-line basis.</p><p class="font-semibold text-slate-900">What should the depreciation expense for the year be?</p>`,
+        prefix: '$', suffix: '',
+        accepted: ['12500'],
+        displayCorrect: '$12,500',
+        explanation: `• Accumulated depreciation over 2 prior years = $200,000 − $150,000 = $50,000 → Annual straight-line depreciation = $25,000.<br>• Under <strong>IFRS 5.25</strong>, depreciation ceases once classified as held for sale (halfway through the year = 6 months): $25,000 × 6/12 = <strong>$12,500</strong>.`
+      }
+    ]
   }
 ];
 
@@ -1337,13 +1432,13 @@ const STORAGE_KEY = 'acca_fr_cbe_state_v1';
 let state = {
   view: 'home', // 'home' | 'instructions' | 'exam' | 'review_screen' | 'results'
   activeExamId: null,
-  timerMode: { exam1: 'acca', exam2: 'acca', exam3: 'acca' }, // 'acca' | 'paper' | 'untimed'
+  timerMode: { exam1: 'acca', exam2: 'acca', exam3: 'acca', exam4: 'acca' }, // 'acca' | 'paper' | 'untimed'
   currentQIndex: 0,
   answers: {},      // { [examId]: { [qNum]: value } }
   flags: {},        // { [examId]: { [qNum]: true } }
   visited: {},      // { [examId]: { [qNum]: true } }
   struck: {},       // { [examId]: { [`${qNum}_${key}`]: true } }
-  scratchpad: { exam1: '', exam2: '', exam3: '' },
+  scratchpad: { exam1: '', exam2: '', exam3: '', exam4: '' },
   highlights: {},   // { [examId]: { [key]: html } }
   savedTimers: {},  // { [examId]: { timeRemainingSec, elapsedSec, mode } }
   timeRemainingSec: 0,
@@ -1826,7 +1921,7 @@ function renderHome() {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         ${EXAMS.map((exam, idx) => {
           const mode = state.timerMode[exam.id] || 'acca';
           const ansMap = state.answers[exam.id] || {};
